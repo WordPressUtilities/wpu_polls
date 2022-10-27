@@ -1,2 +1,3 @@
-# wpu_polls
-Nice Polls
+# WPU Polls
+
+WPU Polls handle simple polls.
