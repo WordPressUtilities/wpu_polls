@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.0.1
+Version: 0.0.2
 Author: darklg
 Author URI: https://darklg.me/
 License: MIT License
@@ -12,7 +12,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.0.1';
+    private $plugin_version = '0.0.2';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -85,7 +85,7 @@ class WPUPolls {
 
     public function admin_enqueue_scripts() {
         /* Back Script */
-        wp_register_script('wpu_polls_back_script', plugins_url('assets/back.js', __FILE__), array(), $this->plugin_version, true);
+        wp_register_script('wpu_polls_back_script', plugins_url('assets/back.js', __FILE__), array('jquery', 'jquery-ui-sortable'), $this->plugin_version, true);
         wp_enqueue_script('wpu_polls_back_script');
         /* Back Style */
         wp_register_style('wpu_polls_back_style', plugins_url('assets/back.css', __FILE__), array(), $this->plugin_version);
@@ -105,7 +105,6 @@ class WPUPolls {
     }
 
     public function register_post_type() {
-        # POST TYPE
         register_post_type('polls', array(
             'public' => true,
             'label' => __('Polls', 'wpu_polls'),
@@ -116,8 +115,22 @@ class WPUPolls {
 
     /* ADMIN */
     function edit_page_poll($post) {
-        echo 'hello';
-
+        echo '<table class="widefat">';
+        echo '<thead>';
+        echo '<tr>';
+        echo '<th colspan="2">' . __('Answer', 'wpu_polls') . '</th>';
+        echo '<th>' . __('Image', 'wpu_polls') . '</th>';
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody class="wpu-polls-answers">';
+        for ($i = 0; $i < 2; $i++) {
+            echo '<tr>';
+            echo '<td><span class="dashicons dashicons-menu-alt2"></span></td>';
+            echo '<td><input name="wpu_polls_uniqid[]" type="text" /><input name="wpu_polls_answer[]" type="text" /></td>';
+            echo '<td><input name="wpu_polls_answer_image[]" type="number" /></td>';
+            echo '</tr>';
+        }
+        echo '</tbody></table>';
         wp_nonce_field('wpu_polls_post_form', 'wpu_polls_post_form_nonce');
     }
 
@@ -132,6 +145,9 @@ class WPUPolls {
         if (!isset($_POST['wpu_polls_post_form_nonce']) || !wp_verify_nonce($_POST['wpu_polls_post_form_nonce'], 'wpu_polls_post_form')) {
             wp_nonce_ays('');
         }
+        echo '<pre>';
+        var_dump($_POST);
+        echo '</pre>';die;
     }
 
 }
