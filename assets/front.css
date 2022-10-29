@@ -1,2 +1,93 @@
 @charset "UTF-8";
 
+/* ----------------------------------------------------------
+  Wrapper
+---------------------------------------------------------- */
+
+.wpu-poll-main__wrapper {
+    z-index: 1;
+    position: relative;
+}
+
+.wpu-poll-main__wrapper:before {
+    content: '';
+    z-index: 99;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    opacity: 0.50;
+    background-color: #fff;
+    transition: opacity 0.3s ease;
+}
+
+.wpu-poll-main__wrapper:not(.is-loading):before {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-results {
+    display: none;
+}
+
+/* ----------------------------------------------------------
+  Results
+---------------------------------------------------------- */
+
+.wpu-poll-results li {
+    z-index: 1;
+    position: relative;
+    padding: 0.5em;
+}
+
+.wpu-poll-results li + li {
+    margin-top: 0.5em;
+}
+
+.wpu-poll-results li .percent {
+    margin-left: 0.3em;
+}
+
+.wpu-poll-results li .count {
+    margin-left: 0.3em;
+}
+
+.wpu-poll-results li .count:before {
+    content: '(';
+}
+
+.wpu-poll-results li .count:after {
+    content: ') ';
+}
+
+/* Answer
+-------------------------- */
+
+.wpu-poll-results li .part-answer {
+    z-index: 2;
+    position: relative;
+}
+
+/* Background
+-------------------------- */
+
+.wpu-poll-results li .part-background {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #F0F0F0;
+}
+
+.wpu-poll-results li .part-background .bar-count {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #E0E0E0;
+}

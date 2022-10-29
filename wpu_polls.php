@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.0.3
+Version: 0.1.0
 Author: darklg
 Author URI: https://darklg.me/
 License: MIT License
@@ -12,7 +12,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.0.3';
+    private $plugin_version = '0.1.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -32,6 +32,13 @@ class WPUPolls {
             add_meta_box('wpu-polls-box-id', 'az', array(&$this, 'edit_page_poll'), 'polls');
         });
         add_action('save_post', array(&$this, 'save_poll'));
+
+        /* Shortcode */
+        add_shortcode('wpu_polls', array(&$this, 'shortcode'));
+
+        /* Action front */
+        add_action('wp_ajax_nopriv_wpu_polls_answer', array(&$this, 'ajax_action'));
+        add_action('wp_ajax_wpu_polls_answer', array(&$this, 'ajax_action'));
 
     }
 
@@ -93,10 +100,12 @@ class WPUPolls {
     }
 
     public function wp_enqueue_scripts() {
+
         /* Front Script with localization / variables */
-        wp_register_script('wpu_polls_front_script', plugins_url('assets/front.js', __FILE__), array(), $this->plugin_version, true);
+        wp_register_script('wpu_polls_front_script', plugins_url('assets/front.js', __FILE__), array('jquery'), $this->plugin_version, true);
         wp_localize_script('wpu_polls_front_script', 'wpu_polls_settings', array(
-            'my_key' => 'my_value'
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'cacheurl' => $this->get_cache_path_dir('baseurl')
         ));
         wp_enqueue_script('wpu_polls_front_script');
         /* Front Style */
@@ -120,7 +129,7 @@ class WPUPolls {
     /* Edit poll
     -------------------------- */
 
-    function edit_page_poll($post) {
+    public function edit_page_poll($post) {
         $question = get_post_meta($post->ID, 'wpu_polls__question', 1);
         $answers = $this->get_post_answers($post->ID);
 
@@ -151,7 +160,7 @@ class WPUPolls {
 
     /* Answer template */
 
-    function get_template_answer($vars = array()) {
+    private function get_template_answer($vars = array()) {
         $template = '';
         $template .= '<tr class="answer-line">';
         $template .= '<td><span class="dashicons dashicons-menu-alt2"></span></td>';
@@ -167,7 +176,7 @@ class WPUPolls {
     }
 
     /* Getter */
-    function get_post_answers($post_id) {
+    private function get_post_answers($post_id) {
         $answers = get_post_meta($post_id, 'wpu_polls__answers', 1);
         if (!is_array($answers)) {
             $answers = array();
@@ -178,7 +187,7 @@ class WPUPolls {
     /* Save poll
     -------------------------- */
 
-    function save_poll($post_id) {
+    public function save_poll($post_id) {
         $post_keys = array(
             'wpu_polls_uniqid',
             'wpu_polls_answer',
@@ -214,7 +223,7 @@ class WPUPolls {
             if (!$uniqid) {
                 $uniqid = md5(microtime());
             }
-            $image = $_POST['wpu_polls_image'][$i];
+            $image = $_POST['wpu_polls_answer_image'][$i];
             if (!is_numeric($image)) {
                 $image = 0;
             }
@@ -231,6 +240,161 @@ class WPUPolls {
         if (isset($_POST['wpu_polls_question'])) {
             update_post_meta($post_id, 'wpu_polls__question', esc_html($_POST['wpu_polls_question']));
         }
+
+    }
+
+    /* ----------------------------------------------------------
+      Vote
+    ---------------------------------------------------------- */
+
+    /* Add vote */
+
+    private function add_vote($poll_id, $answer_id) {
+        if (!is_numeric($poll_id)) {
+            return;
+        }
+        $answers = get_post_meta($poll_id, 'wpu_polls__answers', 1);
+        $answer_found = false;
+        foreach ($answers as $answer) {
+            if ($answer['uniqid'] == $answer_id) {
+                $answer_found = true;
+            }
+        }
+        if (!$answer_found) {
+            return false;
+        }
+
+        return $this->baseadmindatas->create_line(array(
+            'post_id' => $poll_id,
+            'answer_id' => esc_html($answer_id)
+        ));
+    }
+
+    /* Get votes */
+    private function get_votes_for_poll($poll_id, $cache_results = false) {
+        if (!is_numeric($poll_id)) {
+            return;
+        }
+        global $wpdb;
+        $q = "SELECT answer_id , count(*) as results FROM " . $this->baseadmindatas->tablename . " WHERE post_id=%s GROUP BY answer_id";
+        $results = $wpdb->get_results($wpdb->prepare($q, $poll_id), ARRAY_A);
+        $new_results = array();
+        $nb_votes = 0;
+        foreach ($results as $res) {
+            $nb = intval($res['results'], 10);
+            $nb_votes += $nb;
+            $new_results[$res['answer_id']] = $nb;
+        }
+
+        $data = array(
+            'poll_id' => $poll_id,
+            'nb_votes' => $nb_votes,
+            'results' => $new_results
+        );
+
+        if ($cache_results) {
+            $this->cache_results($data);
+        }
+
+        return $data;
+
+    }
+
+    private function get_cache_path_dir($type = 'basedir') {
+        $upload_dir = wp_upload_dir();
+        $sep = DIRECTORY_SEPARATOR;
+        return $upload_dir[$type] . $sep . 'wpu_polls' . $sep;
+    }
+
+    /* Cache */
+    private function cache_results($data) {
+        if (!is_array($data)) {
+            return;
+        }
+        $cache_dir = $this->get_cache_path_dir();
+        if (!is_dir($cache_dir)) {
+            mkdir($cache_dir);
+        }
+        $cache_file = $cache_dir . $data['poll_id'] . '.json';
+        return file_put_contents($cache_file, json_encode($data));
+    }
+
+    /* ----------------------------------------------------------
+      AJAX Event
+    ---------------------------------------------------------- */
+
+    public function ajax_action() {
+        if (!isset($_POST['poll_id'], $_POST['answer'])) {
+            wp_send_json_error();
+        }
+        $add_vote = $this->add_vote($_POST['poll_id'], $_POST['answer']);
+        if (!$add_vote) {
+            wp_send_json_error();
+        }
+        wp_send_json($this->get_votes_for_poll($_POST['poll_id'], 1));
+    }
+
+    /* ----------------------------------------------------------
+      Shortcode
+    ---------------------------------------------------------- */
+
+    public function shortcode($atts = array()) {
+        if (!is_array($atts) || !isset($atts['id']) || !$atts['id'] || !is_numeric($atts['id'])) {
+            return '';
+        }
+        return $this->get_vote_content($atts['id']);
+
+    }
+
+    private function get_vote_content($poll_id) {
+        $question = get_post_meta($poll_id, 'wpu_polls__question', 1);
+        $answers = get_post_meta($poll_id, 'wpu_polls__answers', 1);
+        if (!$question || !$answers) {
+            return '';
+        }
+
+        $results = $this->get_votes_for_poll($poll_id, 1);
+
+        $html_main = '';
+        $html_results = '';
+        foreach ($answers as $answer) {
+            $answer_id = 'answer__' . $poll_id . '__' . $answer['uniqid'];
+            /* Main */
+            $html_main .= '<li class="wpu-poll-main__answer">';
+            $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="radio" name="answer" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
+            $html_main .= '</li>';
+            /* Results */
+            $html_results .= '<li class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
+            $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span><span class="count"></span><span class="percent"></span></span>';
+            $html_results .= '<span class="part-background"><span class="background"></span><span class="bar-count"></span></span>';
+            $html_results .= '</li>';
+        }
+
+        /* Wrapper start */
+        $html = '<div class="wpu-poll-main__wrapper" data-has-voted="0" data-poll-id="' . $poll_id . '">';
+
+        /* Questions */
+        $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';
+
+        /* Answers */
+        $html .= '<div class="wpu-poll-main">';
+        $html .= '<ul class="wpu-poll-main__answers">';
+        $html .= $html_main;
+        $html .= '</ul>';
+        $html .= '<p class="wpu-poll-main__submit"><button type="button"><span>' . __('Submit', 'wpu_polls') . '</span></button></p>';
+        $html .= '</div>';
+
+        /* Results */
+        $html .= '<div class="wpu-poll-results">';
+        $html .= '<ul>';
+        $html .= $html_results;
+        $html .= '</ul>';
+        $html .= '</div>';
+
+        /* Wrapper end */
+        $html .= '</div>';
+
+        return $html;
 
     }
 
