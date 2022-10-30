@@ -1,2 +1,24 @@
 @charset "UTF-8";
 
+/* ----------------------------------------------------------
+  Admin preview
+---------------------------------------------------------- */
+
+.wp-admin .wpu-poll-results {
+    display: none;
+}
+
+/* ----------------------------------------------------------
+  Image
+---------------------------------------------------------- */
+
+.answer-line__image .preview-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.answer-line__image:not([data-has-image="0"]) .add-image,
+.answer-line__image[data-has-image="0"] .remove-image {
+    display: none;
+}

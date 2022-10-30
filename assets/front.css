@@ -33,10 +33,28 @@
 }
 
 /* ----------------------------------------------------------
+  Main
+---------------------------------------------------------- */
+
+.wpu-poll-main__answers li {
+    list-style-type: none;
+}
+
+.wpu-poll-main__answers .answer__inner {
+    z-index: 1;
+    position: relative;
+    padding: 0.5em;
+}
+
+/* ----------------------------------------------------------
   Results
 ---------------------------------------------------------- */
 
 .wpu-poll-results li {
+    list-style-type: none;
+}
+
+.wpu-poll-results .answer__inner {
     z-index: 1;
     position: relative;
     padding: 0.5em;

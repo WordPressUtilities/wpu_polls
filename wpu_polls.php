@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.1.0
+Version: 0.2.0
 Author: darklg
 Author URI: https://darklg.me/
 License: MIT License
@@ -12,7 +12,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.1.0';
+    private $plugin_version = '0.2.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -100,7 +100,6 @@ class WPUPolls {
     }
 
     public function wp_enqueue_scripts() {
-
         /* Front Script with localization / variables */
         wp_register_script('wpu_polls_front_script', plugins_url('assets/front.js', __FILE__), array('jquery'), $this->plugin_version, true);
         wp_localize_script('wpu_polls_front_script', 'wpu_polls_settings', array(
@@ -164,8 +163,15 @@ class WPUPolls {
         $template = '';
         $template .= '<tr class="answer-line">';
         $template .= '<td><span class="dashicons dashicons-menu-alt2"></span></td>';
-        $template .= '<td><input name="wpu_polls_uniqid[]" type="hidden" value="##uniqid##" /><input class="answer-text" name="wpu_polls_answer[]" type="text" value="##answer##" /></td>';
-        $template .= '<td><input name="wpu_polls_answer_image[]" type="number" value="##image##" /></td>';
+        $template .= '<td><input class="answer-line__uniqid" name="wpu_polls_uniqid[]" type="hidden" value="##uniqid##" /><input class="answer-text" name="wpu_polls_answer[]" type="text" value="##answer##" /></td>';
+        $template .= '<td>';
+        $template .= '<div class="answer-line__image" data-has-image="##image##">';
+        $template .= '<input class="input-image" name="wpu_polls_answer_image[]" type="hidden" value="##image##" />';
+        $template .= '<div class="preview-image">##imagepreview##</div>';
+        $template .= '<button type="button" class="add-image">' . __('Add Image', 'wpu_polls') . '</button>';
+        $template .= '<button type="button" class="remove-image">' . __('Remove Image', 'wpu_polls') . '</button>';
+        $template .= '</div>';
+        $template .= '</td>';
         $template .= '<td><button class="delete-line" title="' . esc_attr(__('Delete this line', 'wpu_polls')) . '">&times;</button></td>';
         $template .= '</tr>';
         foreach ($vars as $key => $var) {
@@ -176,10 +182,25 @@ class WPUPolls {
     }
 
     /* Getter */
-    private function get_post_answers($post_id) {
+    private function get_post_answers($post_id, $args = array()) {
         $answers = get_post_meta($post_id, 'wpu_polls__answers', 1);
         if (!is_array($answers)) {
             $answers = array();
+        }
+        if (!is_array($args)) {
+            $args = array();
+        }
+        if (!isset($args['image_size'])) {
+            $args['image_size'] = 'thumbnail';
+        }
+        foreach ($answers as $k => $answer) {
+            $answers[$k]['imagepreview'] = '';
+            if ($answer['image']) {
+                $img = wp_get_attachment_image($answer['image'], $args['image_size']);
+                if ($img) {
+                    $answers[$k]['imagepreview'] = $img;
+                }
+            }
         }
         return $answers;
     }
@@ -348,7 +369,9 @@ class WPUPolls {
 
     private function get_vote_content($poll_id) {
         $question = get_post_meta($poll_id, 'wpu_polls__question', 1);
-        $answers = get_post_meta($poll_id, 'wpu_polls__answers', 1);
+        $answers = $this->get_post_answers($poll_id, array(
+            'image_size' => 'medium'
+        ));
         if (!$question || !$answers) {
             return '';
         }
@@ -361,12 +384,20 @@ class WPUPolls {
             $answer_id = 'answer__' . $poll_id . '__' . $answer['uniqid'];
             /* Main */
             $html_main .= '<li class="wpu-poll-main__answer">';
+            if ($answer['imagepreview']) {
+                $html_main .= '<label class="part-image" for="' . $answer_id . '">' . $answer['imagepreview'] . '</label>';
+            }
+            $html_main .= '<div class="answer__inner">';
             $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="radio" name="answer" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
+            $html_main .= '</div>';
             $html_main .= '</li>';
             /* Results */
             $html_results .= '<li class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
+            $html_results .= $answer['imagepreview'];
+            $html_results .= '<div class="answer__inner">';
             $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span><span class="count"></span><span class="percent"></span></span>';
             $html_results .= '<span class="part-background"><span class="background"></span><span class="bar-count"></span></span>';
+            $html_results .= '</div>';
             $html_results .= '</li>';
         }
 
