@@ -1,7 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
+"POT-Creation-Date: 2022-10-31 22:09+0000\n"
 "PO-Revision-Date: \n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
@@ -10,4 +12,140 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-KeywordsList: __;_e\n"
+"X-Generator: Poedit 3.2\n"
 "X-Poedit-SearchPath-0: ../.\n"
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:555
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:797
+msgid "New Post"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:557
+msgid "Back"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:576
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:165
+msgid "No"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:577
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:165
+msgid "Yes"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:591 .././wpu_polls.php:415
+msgid "Submit"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:760
+#, php-format
+msgid "Items %s - %s"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:773
+#, php-format
+msgid "<strong>Filter :</strong> %s • <strong>Value :</strong> %s"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:774
+msgid "Reset"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:783
+msgid "Search"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:785
+msgid "Clear"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:842
+msgid "Show more details"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:848
+msgid "Edit"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:848
+msgid "View"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:855
+msgid "Delete"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:861
+msgid "Export all"
+msgstr ""
+
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:863
+msgid "Export filtered view"
+msgstr ""
+
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:136
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:552
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:559
+msgid "Settings"
+msgstr ""
+
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:301
+msgid "Settings saved."
+msgstr ""
+
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:347
+msgid "Upload New Media"
+msgstr ""
+
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:498
+msgid "Language"
+msgstr ""
+
+#: .././inc/WPUBaseSettings/WPUBaseSettings.php:574
+msgid "Save"
+msgstr ""
+
+#: .././wpu_polls.php:78
+msgid "Import Settings"
+msgstr ""
+
+#: .././wpu_polls.php:84
+msgid "My Value"
+msgstr ""
+
+#: .././wpu_polls.php:85
+msgid "A little help."
+msgstr ""
+
+#: .././wpu_polls.php:118
+msgid "Polls"
+msgstr "Sondages"
+
+#: .././wpu_polls.php:136
+msgid "Question:"
+msgstr "Question :"
+
+#: .././wpu_polls.php:142
+msgid "Answer"
+msgstr "Réponse"
+
+#: .././wpu_polls.php:143
+msgid "Image"
+msgstr "Image"
+
+#: .././wpu_polls.php:153
+msgid "Add an answer"
+msgstr "Ajouter une réponse"
+
+#: .././wpu_polls.php:171
+msgid "Add an image"
+msgstr "Ajouter une image"
+
+#: .././wpu_polls.php:172
+msgid "Remove this image"
+msgstr "Retirer cette image"
+
+#: .././wpu_polls.php:175
+msgid "Delete this line"
+msgstr ""

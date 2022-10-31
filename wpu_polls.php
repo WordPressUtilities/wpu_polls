@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.2.0
+Version: 0.2.1
 Author: darklg
 Author URI: https://darklg.me/
 License: MIT License
@@ -12,7 +12,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.2.0';
+    private $plugin_version = '0.2.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -133,14 +133,17 @@ class WPUPolls {
         $answers = $this->get_post_answers($post->ID);
 
         /* Question */
-        echo '<p><label for="wpu-polls-question">' . __('Question:', 'wpu_polls') . '</label><br /><input type="text" name="wpu_polls_question" id="wpu-polls-question" value="' . esc_attr($question) . '" /></p>';
+        echo '<p>';
+        echo '<label for="wpu-polls-question">' . __('Question:', 'wpu_polls') . '</label>';
+        echo '<input type="text" name="wpu_polls_question" id="wpu-polls-question" value="' . esc_attr($question) . '" />';
+        echo '</p>';
 
         /* Answers */
         echo '<table class="widefat striped">';
         echo '<thead>';
         echo '<tr>';
-        echo '<th colspan="2">' . __('Answer', 'wpu_polls') . '</th>';
         echo '<th colspan="2">' . __('Image', 'wpu_polls') . '</th>';
+        echo '<th colspan="2">' . __('Answer', 'wpu_polls') . '</th>';
         echo '</tr>';
         echo '</thead>';
         echo '<tbody class="wpu-polls-answers" id="wpu-polls-answers">';
@@ -150,7 +153,7 @@ class WPUPolls {
         echo '</tbody></table>';
 
         /* Add a line */
-        echo '<p><button type="button" id="wpu-polls-answer-add-line">' . __('Add a line', 'wpu_polls') . '</button></p>';
+        echo '<p style="text-align:right"><button class="button button-primary button-large" type="button" id="wpu-polls-answer-add-line">' . __('Add an answer', 'wpu_polls') . '</button></p>';
 
         /* Hidden fields */
         wp_nonce_field('wpu_polls_post_form', 'wpu_polls_post_form_nonce');
@@ -162,18 +165,24 @@ class WPUPolls {
     private function get_template_answer($vars = array()) {
         $template = '';
         $template .= '<tr class="answer-line">';
-        $template .= '<td><span class="dashicons dashicons-menu-alt2"></span></td>';
-        $template .= '<td><input class="answer-line__uniqid" name="wpu_polls_uniqid[]" type="hidden" value="##uniqid##" /><input class="answer-text" name="wpu_polls_answer[]" type="text" value="##answer##" /></td>';
-        $template .= '<td>';
+        $template .= '<td style="width:1em"><span class="dashicons dashicons-menu-alt2"></span></td>';
+        $template .= '<td style="width:150px;">';
         $template .= '<div class="answer-line__image" data-has-image="##image##">';
         $template .= '<input class="input-image" name="wpu_polls_answer_image[]" type="hidden" value="##image##" />';
         $template .= '<div class="preview-image">##imagepreview##</div>';
-        $template .= '<button type="button" class="add-image">' . __('Add Image', 'wpu_polls') . '</button>';
-        $template .= '<button type="button" class="remove-image">' . __('Remove Image', 'wpu_polls') . '</button>';
+        $template .= '<button type="button" class="add-image">' . __('Add an image', 'wpu_polls') . '</button>';
+        $template .= '<button type="button" class="remove-image">' . __('Remove this image', 'wpu_polls') . '</button>';
         $template .= '</div>';
         $template .= '</td>';
-        $template .= '<td><button class="delete-line" title="' . esc_attr(__('Delete this line', 'wpu_polls')) . '">&times;</button></td>';
+        $template .= '<td><input class="answer-line__uniqid" name="wpu_polls_uniqid[]" type="hidden" value="##uniqid##" /><input class="answer-text" name="wpu_polls_answer[]" type="text" value="##answer##" /></td>';
+        $template .= '<td style="width:1em;"><button class="delete-line" title="' . esc_attr(__('Delete this line', 'wpu_polls')) . '">&times;</button></td>';
         $template .= '</tr>';
+        if (!is_array($vars)) {
+            $vars = array();
+        }
+        if (!isset($vars['image']) || !$vars['image']) {
+            $vars['image'] = 0;
+        }
         foreach ($vars as $key => $var) {
             $template = str_replace('##' . $key . '##', $var, $template);
         }
