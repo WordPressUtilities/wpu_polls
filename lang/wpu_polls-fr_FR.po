@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2022-10-31 22:09+0000\n"
+"POT-Creation-Date: 2022-11-01 23:27+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -34,7 +34,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:591 .././wpu_polls.php:415
+#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:591 .././wpu_polls.php:441
 msgid "Submit"
 msgstr ""
 
@@ -118,34 +118,50 @@ msgstr ""
 msgid "A little help."
 msgstr ""
 
-#: .././wpu_polls.php:118
+#: .././wpu_polls.php:97
+msgid "You can’t have only empty choices"
+msgstr "Vous ne pouvez pas avoir seulement des choix vides"
+
+#: .././wpu_polls.php:98
+msgid "Images should be on every choice, or none of them."
+msgstr "Les images devraient être sur tous les choix, ou aucun d’entre eux."
+
+#: .././wpu_polls.php:99
+msgid "Text should be on every choice, or none of them."
+msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
+
+#: .././wpu_polls.php:100
+msgid "You need at least two choices."
+msgstr "Vous avez besoin d’au moins deux choix."
+
+#: .././wpu_polls.php:124
 msgid "Polls"
 msgstr "Sondages"
 
-#: .././wpu_polls.php:136
+#: .././wpu_polls.php:143
 msgid "Question:"
 msgstr "Question :"
 
-#: .././wpu_polls.php:142
-msgid "Answer"
-msgstr "Réponse"
-
-#: .././wpu_polls.php:143
+#: .././wpu_polls.php:151
 msgid "Image"
 msgstr "Image"
 
-#: .././wpu_polls.php:153
+#: .././wpu_polls.php:152
+msgid "Answer"
+msgstr "Réponse"
+
+#: .././wpu_polls.php:162
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: .././wpu_polls.php:171
+#: .././wpu_polls.php:179
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: .././wpu_polls.php:172
+#: .././wpu_polls.php:180
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: .././wpu_polls.php:175
+#: .././wpu_polls.php:184
 msgid "Delete this line"
 msgstr ""

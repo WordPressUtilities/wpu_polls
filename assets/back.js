@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     'use strict';
+
+    /* Only on a polls edit page */
+    var $form = jQuery('#post'),
+        $body = jQuery('body');
+    if (!$form.length || !$body.hasClass('post-type-polls')) {
+        return;
+    }
+
     /* Hide metabox layout */
     jQuery('#wpu-polls-box-id').each(function() {
         jQuery(this).removeClass('postbox');
@@ -94,5 +102,42 @@ document.addEventListener('DOMContentLoaded', function() {
         $items.$input = $items.$wrapper.find('.input-image');
         return $items;
     }
+
+    /* Avoid some errors on submit */
+    $form.on('submit', function(e) {
+        var _answers = $form.find('.wpu-polls-answers .answer-line');
+        if (_answers.length < 2) {
+            e.preventDefault();
+            alert(wpu_polls_settings_back.error_need_two_choices);
+        }
+
+        /* Images */
+        var _nb_images = 0;
+        _answers.find('.input-image').each(function(i, $item) {
+            if ($item.value && $item.value != '0') {
+                _nb_images++;
+            }
+        });
+        if(_nb_images > 0 && _nb_images != _answers.length){
+            e.preventDefault();
+            alert(wpu_polls_settings_back.error_need_all_images);
+        }
+        /* Text */
+        var _nb_text = 0;
+        _answers.find('.answer-text').each(function(i, $item) {
+            if ($item.value) {
+                _nb_text++;
+            }
+        });
+        if(_nb_text > 0 && _nb_text != _answers.length){
+            e.preventDefault();
+            alert(wpu_polls_settings_back.error_need_all_text);
+        }
+        /* Content */
+        if(_nb_text == 0 && _nb_images == 0){
+            e.preventDefault();
+            alert(wpu_polls_settings_back.error_need_content);
+        }
+    });
 
 });

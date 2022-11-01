@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.2.1
+Version: 0.3.0
 Author: darklg
 Author URI: https://darklg.me/
 License: MIT License
@@ -12,7 +12,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.2.1';
+    private $plugin_version = '0.3.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -93,6 +93,12 @@ class WPUPolls {
     public function admin_enqueue_scripts() {
         /* Back Script */
         wp_register_script('wpu_polls_back_script', plugins_url('assets/back.js', __FILE__), array('jquery', 'jquery-ui-sortable'), $this->plugin_version, true);
+        wp_localize_script('wpu_polls_back_script', 'wpu_polls_settings_back', array(
+            'error_need_content' => __('You can’t have only empty choices', 'wpu_polls'),
+            'error_need_all_images' => __('Images should be on every choice, or none of them.', 'wpu_polls'),
+            'error_need_all_text' => __('Text should be on every choice, or none of them.', 'wpu_polls'),
+            'error_need_two_choices' => __('You need at least two choices.', 'wpu_polls')
+        ));
         wp_enqueue_script('wpu_polls_back_script');
         /* Back Style */
         wp_register_style('wpu_polls_back_style', plugins_url('assets/back.css', __FILE__), array(), $this->plugin_version);
@@ -218,13 +224,19 @@ class WPUPolls {
     -------------------------- */
 
     public function save_poll($post_id) {
+
+        /* Only once */
+        if (defined('WPU_POLLS__SAVE_POST')) {
+            return;
+        }
+        define('WPU_POLLS__SAVE_POST', 1);
+
+        /* Empty or invalid post response */
         $post_keys = array(
             'wpu_polls_uniqid',
             'wpu_polls_answer',
             'wpu_polls_answer_image'
         );
-
-        /* Empty or invalid post response */
         if (empty($_POST)) {
             return;
         }
@@ -270,6 +282,11 @@ class WPUPolls {
         if (isset($_POST['wpu_polls_question'])) {
             update_post_meta($post_id, 'wpu_polls__question', esc_html($_POST['wpu_polls_question']));
         }
+
+        wp_update_post(array(
+            'ID' => $post_id,
+            'post_content' => '[wpu_polls id="' . $post_id . '"]'
+        ));
 
     }
 
