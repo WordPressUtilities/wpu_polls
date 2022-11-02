@@ -4,15 +4,17 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.3.0
-Author: darklg
+Version: 0.4.0
+Author: Darklg
 Author URI: https://darklg.me/
+Text Domain: wpu_polls
+Domain Path: /lang/
 License: MIT License
 License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.3.0';
+    private $plugin_version = '0.4.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -21,15 +23,19 @@ class WPUPolls {
 
     public function __construct() {
         add_filter('plugins_loaded', array(&$this, 'plugins_loaded'));
+
+        # Post type
         add_action('init', array(&$this, 'register_post_type'));
-        # Back Assets
+        add_filter('manage_polls_posts_columns', array(&$this, 'manage_polls_posts_columns'));
+        add_action('manage_polls_posts_custom_column', array(&$this, 'manage_polls_posts_custom_column'), 10, 2);
+
+        # Assets
         add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
-        # Front Assets
         add_action('wp_enqueue_scripts', array(&$this, 'wp_enqueue_scripts'));
 
         /* Admin */
         add_action('add_meta_boxes', function () {
-            add_meta_box('wpu-polls-box-id', 'az', array(&$this, 'edit_page_poll'), 'polls');
+            add_meta_box('wpu-polls-box-id', 'Poll box', array(&$this, 'edit_page_poll'), 'polls');
         });
         add_action('save_post', array(&$this, 'save_poll'));
 
@@ -45,6 +51,7 @@ class WPUPolls {
     public function plugins_loaded() {
         # TRANSLATION
         load_plugin_textdomain('wpu_polls', false, dirname(plugin_basename(__FILE__)) . '/lang/');
+        $this->plugin_description = __('WPU Polls handle simple polls', 'wpu_polls');
         # CUSTOM TABLE
         include dirname(__FILE__) . '/inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php';
         $this->baseadmindatas = new \wpu_polls\WPUBaseAdminDatas();
@@ -73,17 +80,12 @@ class WPUPolls {
             'plugin_name' => $this->plugin_settings['name'],
             'plugin_id' => $this->plugin_settings['id'],
             'option_id' => $this->plugin_settings['id'] . '_options',
-            'sections' => array(
-                'import' => array(
-                    'name' => __('Import Settings', 'wpu_polls')
-                )
-            )
+            'sections' => array()
         );
         $this->settings = array(
-            'value' => array(
-                'label' => __('My Value', 'wpu_polls'),
-                'help' => __('A little help.', 'wpu_polls'),
-                'type' => 'textarea'
+            'public' => array(
+                'label' => __('Public post type', 'wpu_polls'),
+                'type' => 'radio'
             )
         );
         include dirname(__FILE__) . '/inc/WPUBaseSettings/WPUBaseSettings.php';
@@ -119,12 +121,61 @@ class WPUPolls {
     }
 
     public function register_post_type() {
-        register_post_type('polls', array(
-            'public' => true,
+        $labels = array(
+            'name' => _x('Polls', 'Post type general name', 'wpu_polls'),
+            'singular_name' => _x('Poll', 'Post type singular name', 'wpu_polls'),
+            'menu_name' => _x('Polls', 'Admin Menu text', 'wpu_polls'),
+            'name_admin_bar' => _x('Poll', 'Add New on Toolbar', 'wpu_polls'),
+            'add_new' => __('Add New', 'wpu_polls'),
+            'add_new_item' => __('Add New Poll', 'wpu_polls'),
+            'new_item' => __('New Poll', 'wpu_polls'),
+            'edit_item' => __('Edit Poll', 'wpu_polls'),
+            'view_item' => __('View Poll', 'wpu_polls'),
+            'all_items' => __('All Polls', 'wpu_polls'),
+            'search_items' => __('Search Polls', 'wpu_polls'),
+            'parent_item_colon' => __('Parent Polls:', 'wpu_polls'),
+            'not_found' => __('No polls found.', 'wpu_polls'),
+            'not_found_in_trash' => __('No polls found in Trash.', 'wpu_polls'),
+            'archives' => _x('Poll archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'wpu_polls'),
+            'insert_into_item' => _x('Insert into poll', 'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4', 'wpu_polls'),
+            'uploaded_to_this_item' => _x('Uploaded to this poll', 'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4', 'wpu_polls'),
+            'filter_items_list' => _x('Filter polls list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'wpu_polls'),
+            'items_list_navigation' => _x('Polls list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'wpu_polls'),
+            'items_list' => _x('Polls list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'wpu_polls')
+        );
+        $args = array(
+            'labels' => $labels,
+            'public' => false,
+            'show_in_nav_menus' => true,
+            'show_ui' => true,
             'label' => __('Polls', 'wpu_polls'),
             'menu_icon' => 'dashicons-format-status',
             'supports' => array('title', 'author')
-        ));
+        );
+
+        $settings = $this->settings_obj->get_settings();
+        if (isset($settings['public']) && $settings['public'] == '1') {
+            $args['public'] = true;
+        }
+
+        register_post_type('polls', $args);
+    }
+
+    function manage_polls_posts_columns($columns) {
+        $new_columns = array();
+        foreach ($columns as $k => $col) {
+            $new_columns[$k] = $col;
+            if ($k == 'title') {
+                $new_columns['poll_question'] = 'Question';
+            }
+        }
+        return $new_columns;
+    }
+
+    function manage_polls_posts_custom_column($column_key, $post_id) {
+        if ($column_key == 'poll_question') {
+            echo get_post_meta($post_id, 'wpu_polls__question', 1);
+        }
     }
 
     /* ----------------------------------------------------------
@@ -181,7 +232,7 @@ class WPUPolls {
         $template .= '</div>';
         $template .= '</td>';
         $template .= '<td><input class="answer-line__uniqid" name="wpu_polls_uniqid[]" type="hidden" value="##uniqid##" /><input class="answer-text" name="wpu_polls_answer[]" type="text" value="##answer##" /></td>';
-        $template .= '<td style="width:1em;"><button class="delete-line" title="' . esc_attr(__('Delete this line', 'wpu_polls')) . '">&times;</button></td>';
+        $template .= '<td style="width:1em;"><button class="delete-line" title="' . esc_attr(__('Delete this reply', 'wpu_polls')) . '">&times;</button></td>';
         $template .= '</tr>';
         if (!is_array($vars)) {
             $vars = array();

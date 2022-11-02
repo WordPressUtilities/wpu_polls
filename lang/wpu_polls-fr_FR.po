@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2022-11-01 23:27+0000\n"
+"POT-Creation-Date: 2022-11-02 22:09+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -10,158 +10,167 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-Basepath: .\n"
-"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_x;_e\n"
 "X-Generator: Poedit 3.2\n"
-"X-Poedit-SearchPath-0: ../.\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: inc/WPUBaseAdminDatas\n"
+"X-Poedit-SearchPathExcluded-1: inc/WPUBaseSettings\n"
 
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:555
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:797
-msgid "New Post"
-msgstr ""
+#: wpu_polls.php:54
+msgid "WPU Polls handle simple polls"
+msgstr "WPU Polls gère des sondages simples"
 
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:557
-msgid "Back"
-msgstr ""
+#: wpu_polls.php:87
+msgid "Public post type"
+msgstr "Post type public"
 
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:576
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:165
-msgid "No"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:577
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:165
-msgid "Yes"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:591 .././wpu_polls.php:441
-msgid "Submit"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:760
-#, php-format
-msgid "Items %s - %s"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:773
-#, php-format
-msgid "<strong>Filter :</strong> %s • <strong>Value :</strong> %s"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:774
-msgid "Reset"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:783
-msgid "Search"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:785
-msgid "Clear"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:842
-msgid "Show more details"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:848
-msgid "Edit"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:848
-msgid "View"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:855
-msgid "Delete"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:861
-msgid "Export all"
-msgstr ""
-
-#: .././inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php:863
-msgid "Export filtered view"
-msgstr ""
-
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:136
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:552
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:559
-msgid "Settings"
-msgstr ""
-
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:301
-msgid "Settings saved."
-msgstr ""
-
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:347
-msgid "Upload New Media"
-msgstr ""
-
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:498
-msgid "Language"
-msgstr ""
-
-#: .././inc/WPUBaseSettings/WPUBaseSettings.php:574
-msgid "Save"
-msgstr ""
-
-#: .././wpu_polls.php:78
-msgid "Import Settings"
-msgstr ""
-
-#: .././wpu_polls.php:84
-msgid "My Value"
-msgstr ""
-
-#: .././wpu_polls.php:85
-msgid "A little help."
-msgstr ""
-
-#: .././wpu_polls.php:97
+#: wpu_polls.php:99
 msgid "You can’t have only empty choices"
 msgstr "Vous ne pouvez pas avoir seulement des choix vides"
 
-#: .././wpu_polls.php:98
+#: wpu_polls.php:100
 msgid "Images should be on every choice, or none of them."
 msgstr "Les images devraient être sur tous les choix, ou aucun d’entre eux."
 
-#: .././wpu_polls.php:99
+#: wpu_polls.php:101
 msgid "Text should be on every choice, or none of them."
 msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 
-#: .././wpu_polls.php:100
+#: wpu_polls.php:102
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: .././wpu_polls.php:124
+#: wpu_polls.php:125 wpu_polls.php:127 wpu_polls.php:151
 msgid "Polls"
 msgstr "Sondages"
 
-#: .././wpu_polls.php:143
+#: wpu_polls.php:126 wpu_polls.php:128
+msgid "Poll"
+msgstr "Sondage"
+
+#: wpu_polls.php:129
+msgid "Add New"
+msgstr "Ajouter"
+
+#: wpu_polls.php:130
+msgid "Add New Poll"
+msgstr "Ajouter un nouveau sondage"
+
+#: wpu_polls.php:131
+msgid "New Poll"
+msgstr "Nouveau Sondage"
+
+#: wpu_polls.php:132
+msgid "Edit Poll"
+msgstr "Modifier le sondage"
+
+#: wpu_polls.php:133
+msgid "View Poll"
+msgstr "Voir le sondage"
+
+#: wpu_polls.php:134
+msgid "All Polls"
+msgstr "Tous les sondages"
+
+#: wpu_polls.php:135
+msgid "Search Polls"
+msgstr "Rechercher un sondage"
+
+#: wpu_polls.php:136
+msgid "Parent Polls:"
+msgstr "Sondage Parent:"
+
+#: wpu_polls.php:137
+msgid "No polls found."
+msgstr "Aucun sondage trouvé."
+
+#: wpu_polls.php:138
+msgid "No polls found in Trash."
+msgstr "Aucun sondage trouvé dans la corbeille."
+
+#: wpu_polls.php:139
+msgid "Poll archives"
+msgstr "Archives des sondages"
+
+#: wpu_polls.php:140
+msgid "Insert into poll"
+msgstr "Insérer dans le sondage"
+
+#: wpu_polls.php:141
+msgid "Uploaded to this poll"
+msgstr "Téléchargé vers ce sondage"
+
+#: wpu_polls.php:142
+msgid "Filter polls list"
+msgstr "Filtrer la liste des sondages"
+
+#: wpu_polls.php:143
+msgid "Polls list navigation"
+msgstr "Navigation dans la liste des sondages"
+
+#: wpu_polls.php:144
+msgid "Polls list"
+msgstr "Liste des sondages"
+
+#: wpu_polls.php:194
 msgid "Question:"
 msgstr "Question :"
 
-#: .././wpu_polls.php:151
+#: wpu_polls.php:202
 msgid "Image"
 msgstr "Image"
 
-#: .././wpu_polls.php:152
+#: wpu_polls.php:203
 msgid "Answer"
 msgstr "Réponse"
 
-#: .././wpu_polls.php:162
+#: wpu_polls.php:213
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: .././wpu_polls.php:179
+#: wpu_polls.php:230
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: .././wpu_polls.php:180
+#: wpu_polls.php:231
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: .././wpu_polls.php:184
-msgid "Delete this line"
-msgstr ""
+#: wpu_polls.php:235
+msgid "Delete this reply"
+msgstr "Supprimer cette réponse"
+
+#: wpu_polls.php:492
+msgid "Submit"
+msgstr "Envoyer"
+
+#~ msgid "Import Settings"
+#~ msgstr "wp"
+
+#~ msgid "New Post"
+#~ msgstr "Nouvel article"
+
+#~ msgid "Search"
+#~ msgstr "Rechercher"
+
+#~ msgid "Show more details"
+#~ msgstr "Afficher plus de détails"
+
+#~ msgid "Edit"
+#~ msgstr "Modifier"
+
+#~ msgid "View"
+#~ msgstr "Voir"
+
+#~ msgid "Save"
+#~ msgstr "Sauvegarder"
+
+#~ msgid "Poll Cover Image"
+#~ msgstr "Image de couverture du sondage"
+
+#~ msgid "Set cover image"
+#~ msgstr "Définir une image de couverture"
+
+#~ msgid "Remove cover image"
+#~ msgstr "Retirer l'image de couverture"
