@@ -70,15 +70,20 @@ document.addEventListener('DOMContentLoaded', function(e) {
     function wpu_poll_build_results($wrapper, response) {
         var $answers = $wrapper.find('.wpu-poll-results'),
             $tmp_item,
+            _count_str = '',
             _percent;
         for (var answer_id in response.results) {
             $tmp_item = $answers.find('[data-results-id="' + answer_id + '"]');
             if (!$tmp_item.length) {
                 continue;
             }
+            _count_str = wpu_polls_settings.str_one_vote;
+            if (response.results[answer_id] > 1) {
+                _count_str = wpu_polls_settings.str_n_votes.replace('%d', response.results[answer_id]);
+            }
             _percent = Math.round(response.results[answer_id] / response.nb_votes * 100);
             $tmp_item.find('.percent').text(_percent + '%');
-            $tmp_item.find('.count').text(response.results[answer_id]);
+            $tmp_item.find('.count').text(_count_str);
             $tmp_item.find('.bar-count').css('width', _percent + '%');
         }
     }

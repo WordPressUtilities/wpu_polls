@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.4.0
+Version: 0.4.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.4.0';
+    private $plugin_version = '0.4.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -112,6 +112,8 @@ class WPUPolls {
         wp_register_script('wpu_polls_front_script', plugins_url('assets/front.js', __FILE__), array('jquery'), $this->plugin_version, true);
         wp_localize_script('wpu_polls_front_script', 'wpu_polls_settings', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'str_one_vote' => __('1 vote', 'wpu_polls'),
+            'str_n_votes' => __('%d votes', 'wpu_polls'),
             'cacheurl' => $this->get_cache_path_dir('baseurl')
         ));
         wp_enqueue_script('wpu_polls_front_script');
@@ -457,8 +459,13 @@ class WPUPolls {
 
         $html_main = '';
         $html_results = '';
+        $has_answer_image = false;
         foreach ($answers as $answer) {
             $answer_id = 'answer__' . $poll_id . '__' . $answer['uniqid'];
+            if ($answer['imagepreview']) {
+                $has_answer_image = true;
+            }
+
             /* Main */
             $html_main .= '<li class="wpu-poll-main__answer">';
             if ($answer['imagepreview']) {
@@ -468,6 +475,7 @@ class WPUPolls {
             $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="radio" name="answer" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
             $html_main .= '</div>';
             $html_main .= '</li>';
+
             /* Results */
             $html_results .= '<li class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
             $html_results .= $answer['imagepreview'];
@@ -486,7 +494,7 @@ class WPUPolls {
 
         /* Answers */
         $html .= '<div class="wpu-poll-main">';
-        $html .= '<ul class="wpu-poll-main__answers">';
+        $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '" class="wpu-poll-main__answers">';
         $html .= $html_main;
         $html .= '</ul>';
         $html .= '<p class="wpu-poll-main__submit"><button type="button"><span>' . __('Submit', 'wpu_polls') . '</span></button></p>';
@@ -494,7 +502,7 @@ class WPUPolls {
 
         /* Results */
         $html .= '<div class="wpu-poll-results">';
-        $html .= '<ul>';
+        $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
         $html .= $html_results;
         $html .= '</ul>';
         $html .= '</div>';

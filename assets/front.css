@@ -72,6 +72,10 @@
     margin-left: 0.3em;
 }
 
+.wpu-poll-results li .count:empty {
+    display: none;
+}
+
 .wpu-poll-results li .count:before {
     content: '(';
 }
