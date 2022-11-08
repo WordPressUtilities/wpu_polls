@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2022-11-02 22:09+0100\n"
+"POT-Creation-Date: 2022-11-08 18:53+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -41,107 +41,116 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:125 wpu_polls.php:127 wpu_polls.php:151
+#: wpu_polls.php:115
+msgid "1 vote"
+msgstr "1 vote"
+
+#: wpu_polls.php:116
+#, php-format
+msgid "%d votes"
+msgstr "%d votes"
+
+#: wpu_polls.php:127 wpu_polls.php:129 wpu_polls.php:153
 msgid "Polls"
 msgstr "Sondages"
 
-#: wpu_polls.php:126 wpu_polls.php:128
+#: wpu_polls.php:128 wpu_polls.php:130
 msgid "Poll"
 msgstr "Sondage"
 
-#: wpu_polls.php:129
+#: wpu_polls.php:131
 msgid "Add New"
 msgstr "Ajouter"
 
-#: wpu_polls.php:130
+#: wpu_polls.php:132
 msgid "Add New Poll"
 msgstr "Ajouter un nouveau sondage"
 
-#: wpu_polls.php:131
+#: wpu_polls.php:133
 msgid "New Poll"
 msgstr "Nouveau Sondage"
 
-#: wpu_polls.php:132
+#: wpu_polls.php:134
 msgid "Edit Poll"
 msgstr "Modifier le sondage"
 
-#: wpu_polls.php:133
+#: wpu_polls.php:135
 msgid "View Poll"
 msgstr "Voir le sondage"
 
-#: wpu_polls.php:134
+#: wpu_polls.php:136
 msgid "All Polls"
 msgstr "Tous les sondages"
 
-#: wpu_polls.php:135
+#: wpu_polls.php:137
 msgid "Search Polls"
 msgstr "Rechercher un sondage"
 
-#: wpu_polls.php:136
+#: wpu_polls.php:138
 msgid "Parent Polls:"
 msgstr "Sondage Parent:"
 
-#: wpu_polls.php:137
+#: wpu_polls.php:139
 msgid "No polls found."
 msgstr "Aucun sondage trouvé."
 
-#: wpu_polls.php:138
+#: wpu_polls.php:140
 msgid "No polls found in Trash."
 msgstr "Aucun sondage trouvé dans la corbeille."
 
-#: wpu_polls.php:139
+#: wpu_polls.php:141
 msgid "Poll archives"
 msgstr "Archives des sondages"
 
-#: wpu_polls.php:140
+#: wpu_polls.php:142
 msgid "Insert into poll"
 msgstr "Insérer dans le sondage"
 
-#: wpu_polls.php:141
+#: wpu_polls.php:143
 msgid "Uploaded to this poll"
 msgstr "Téléchargé vers ce sondage"
 
-#: wpu_polls.php:142
+#: wpu_polls.php:144
 msgid "Filter polls list"
 msgstr "Filtrer la liste des sondages"
 
-#: wpu_polls.php:143
+#: wpu_polls.php:145
 msgid "Polls list navigation"
 msgstr "Navigation dans la liste des sondages"
 
-#: wpu_polls.php:144
+#: wpu_polls.php:146
 msgid "Polls list"
 msgstr "Liste des sondages"
 
-#: wpu_polls.php:194
+#: wpu_polls.php:196
 msgid "Question:"
 msgstr "Question :"
 
-#: wpu_polls.php:202
+#: wpu_polls.php:204
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:203
+#: wpu_polls.php:205
 msgid "Answer"
 msgstr "Réponse"
 
-#: wpu_polls.php:213
+#: wpu_polls.php:215
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:230
+#: wpu_polls.php:232
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:231
+#: wpu_polls.php:233
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:235
+#: wpu_polls.php:237
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:492
+#: wpu_polls.php:491
 msgid "Submit"
 msgstr "Envoyer"
 

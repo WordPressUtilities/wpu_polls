@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.4.1
+Version: 0.4.2
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.4.1';
+    private $plugin_version = '0.4.2';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -124,10 +124,10 @@ class WPUPolls {
 
     public function register_post_type() {
         $labels = array(
-            'name' => _x('Polls', 'Post type general name', 'wpu_polls'),
-            'singular_name' => _x('Poll', 'Post type singular name', 'wpu_polls'),
-            'menu_name' => _x('Polls', 'Admin Menu text', 'wpu_polls'),
-            'name_admin_bar' => _x('Poll', 'Add New on Toolbar', 'wpu_polls'),
+            'name' => __('Polls', 'wpu_polls'),
+            'singular_name' => __('Poll', 'wpu_polls'),
+            'menu_name' => __('Polls', 'wpu_polls'),
+            'name_admin_bar' => __('Poll', 'wpu_polls'),
             'add_new' => __('Add New', 'wpu_polls'),
             'add_new_item' => __('Add New Poll', 'wpu_polls'),
             'new_item' => __('New Poll', 'wpu_polls'),
@@ -468,21 +468,12 @@ class WPUPolls {
 
             /* Main */
             $html_main .= '<li class="wpu-poll-main__answer">';
-            if ($answer['imagepreview']) {
-                $html_main .= '<label class="part-image" for="' . $answer_id . '">' . $answer['imagepreview'] . '</label>';
-            }
-            $html_main .= '<div class="answer__inner">';
-            $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="radio" name="answer" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
-            $html_main .= '</div>';
+            $html_main .= $this->get_vote_content__item_main($answer_id, $answer);
             $html_main .= '</li>';
 
             /* Results */
             $html_results .= '<li class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
-            $html_results .= $answer['imagepreview'];
-            $html_results .= '<div class="answer__inner">';
-            $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span><span class="count"></span><span class="percent"></span></span>';
-            $html_results .= '<span class="part-background"><span class="background"></span><span class="bar-count"></span></span>';
-            $html_results .= '</div>';
+            $html_results .= $this->get_vote_content__item_results($answer_id, $answer);
             $html_results .= '</li>';
         }
 
@@ -512,6 +503,27 @@ class WPUPolls {
 
         return $html;
 
+    }
+
+    function get_vote_content__item_main($answer_id, $answer) {
+        $html_main = '';
+        if ($answer['imagepreview']) {
+            $html_main .= '<label class="part-image" for="' . $answer_id . '">' . $answer['imagepreview'] . '</label>';
+        }
+        $html_main .= '<div class="answer__inner">';
+        $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="radio" name="answer" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
+        $html_main .= '</div>';
+        return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);
+    }
+
+    function get_vote_content__item_results($answer_id, $answer) {
+        $html_results .= $answer['imagepreview'];
+        $html_results .= '<div class="answer__inner">';
+        $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span><span class="count"></span><span class="percent"></span></span>';
+        $html_results .= '<span class="part-background"><span class="background"></span><span class="bar-count"></span></span>';
+        $html_results .= '</div>';
+
+        return apply_filters('wpu_polls__get_vote_content__item_results__html', $html_results, $answer_id, $answer);
     }
 
 }
