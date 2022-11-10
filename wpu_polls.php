@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.4.2
+Version: 0.4.3
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.4.2';
+    private $plugin_version = '0.4.3';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -112,6 +112,7 @@ class WPUPolls {
         wp_register_script('wpu_polls_front_script', plugins_url('assets/front.js', __FILE__), array('jquery'), $this->plugin_version, true);
         wp_localize_script('wpu_polls_front_script', 'wpu_polls_settings', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'str_0_vote' => __('No vote', 'wpu_polls'),
             'str_one_vote' => __('1 vote', 'wpu_polls'),
             'str_n_votes' => __('%d votes', 'wpu_polls'),
             'cacheurl' => $this->get_cache_path_dir('baseurl')
@@ -478,7 +479,7 @@ class WPUPolls {
         }
 
         /* Wrapper start */
-        $html = '<div class="wpu-poll-main__wrapper" data-has-voted="0" data-poll-id="' . $poll_id . '">';
+        $html = '<div class="wpu-poll-main__wrapper"  data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
 
         /* Questions */
         $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';
@@ -517,7 +518,7 @@ class WPUPolls {
     }
 
     function get_vote_content__item_results($answer_id, $answer) {
-        $html_results .= $answer['imagepreview'];
+        $html_results = $answer['imagepreview'];
         $html_results .= '<div class="answer__inner">';
         $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span><span class="count"></span><span class="percent"></span></span>';
         $html_results .= '<span class="part-background"><span class="background"></span><span class="bar-count"></span></span>';

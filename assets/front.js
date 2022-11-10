@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function(e) {
+document.addEventListener('DOMContentLoaded', function() {
     'use strict';
 
     /* Update all polls : counter & vote status */
@@ -70,22 +70,35 @@ document.addEventListener('DOMContentLoaded', function(e) {
     function wpu_poll_build_results($wrapper, response) {
         var $answers = $wrapper.find('.wpu-poll-results'),
             $tmp_item,
-            _count_str = '',
             _percent;
+
+        /* Default content */
+        $answers.find('[data-results-id]').each(function(i, el) {
+            wpu_poll_build_results_item(jQuery(el), 0, 0);
+        });
+
         for (var answer_id in response.results) {
             $tmp_item = $answers.find('[data-results-id="' + answer_id + '"]');
             if (!$tmp_item.length) {
                 continue;
             }
-            _count_str = wpu_polls_settings.str_one_vote;
-            if (response.results[answer_id] > 1) {
-                _count_str = wpu_polls_settings.str_n_votes.replace('%d', response.results[answer_id]);
-            }
             _percent = Math.round(response.results[answer_id] / response.nb_votes * 100);
-            $tmp_item.find('.percent').text(_percent + '%');
-            $tmp_item.find('.count').text(_count_str);
-            $tmp_item.find('.bar-count').css('width', _percent + '%');
+            wpu_poll_build_results_item($tmp_item, response.results[answer_id], _percent);
         }
+    }
+
+    function wpu_poll_build_results_item($item, _nb_results, _percent) {
+        var _count_str = wpu_polls_settings.str_0_vote;
+        if (_nb_results > 0) {
+            _count_str = wpu_polls_settings.str_one_vote;
+        }
+        if (_nb_results > 1) {
+            _count_str = wpu_polls_settings.str_n_votes.replace('%d', _nb_results);
+        }
+        $item.attr('data-count', _nb_results);
+        $item.find('.percent').text(_percent + '%');
+        $item.find('.count').text(_count_str);
+        $item.find('.bar-count').css('width', _percent + '%');
     }
 
     function check_wrapper_vote($wrapper, _poll_id) {
