@@ -40,10 +40,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var _poll_id = $main.attr('data-poll-id');
 
         /* Check value */
-        var $value = $answers.find('input[type="radio"]:checked');
-        if (!$value.length) {
+        var $checkboxes = $answers.find('input[name="answers"]:checked');
+        if (!$checkboxes.length) {
             return false;
         }
+        var _values = [];
+        $checkboxes.each(function(){
+            _values.push(jQuery(this).val());
+        });
 
         /* Loader */
         $main.addClass('is-loading');
@@ -57,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             wpu_polls_settings.ajaxurl, {
                 'action': 'wpu_polls_answer',
                 'poll_id': _poll_id,
-                'answer': $value.val()
+                'answers': _values
             },
             function(response) {
                 check_wrapper_vote($main, _poll_id);

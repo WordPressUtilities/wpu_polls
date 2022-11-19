@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2022-11-10 16:12+0100\n"
+"POT-Creation-Date: 2022-11-19 19:52+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -126,35 +126,43 @@ msgstr "Navigation dans la liste des sondages"
 msgid "Polls list"
 msgstr "Liste des sondages"
 
-#: wpu_polls.php:197
+#: wpu_polls.php:201
 msgid "Question:"
 msgstr "Question :"
 
-#: wpu_polls.php:205
+#: wpu_polls.php:209
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:206
+#: wpu_polls.php:210
 msgid "Answer"
 msgstr "Réponse"
 
-#: wpu_polls.php:216
+#: wpu_polls.php:220
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:233
+#: wpu_polls.php:224
+msgid "Number of answers:"
+msgstr "Nombre de réponses :"
+
+#: wpu_polls.php:227
+msgid "Multiple"
+msgstr "Multiple"
+
+#: wpu_polls.php:246
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:234
+#: wpu_polls.php:247
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:238
+#: wpu_polls.php:251
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:492
+#: wpu_polls.php:528
 msgid "Submit"
 msgstr "Envoyer"
 

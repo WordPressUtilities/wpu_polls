@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.4.3
+Version: 0.5.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.4.3';
+    private $plugin_version = '0.5.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -190,6 +190,10 @@ class WPUPolls {
 
     public function edit_page_poll($post) {
         $question = get_post_meta($post->ID, 'wpu_polls__question', 1);
+        $nbanswers = get_post_meta($post->ID, 'wpu_polls__nbanswers', 1);
+        if (!$nbanswers) {
+            $nbanswers = 1;
+        }
         $answers = $this->get_post_answers($post->ID);
 
         /* Question */
@@ -214,6 +218,15 @@ class WPUPolls {
 
         /* Add a line */
         echo '<p style="text-align:right"><button class="button button-primary button-large" type="button" id="wpu-polls-answer-add-line">' . __('Add an answer', 'wpu_polls') . '</button></p>';
+
+        /* Number of answers */
+        echo '<p>';
+        echo '<label for="wpu-polls-nbanswers">' . __('Number of answers:', 'wpu_polls') . '</label> ';
+        echo '<select name="wpu_polls_nbanswers" id="wpu-polls-nbanswers">';
+        echo '<option ' . ($nbanswers == 1 ? 'selected' : '') . ' value="1">1</option>';
+        echo '<option ' . ($nbanswers == 99 ? 'selected' : '') . ' value="99">' . __('Multiple', 'wpu_polls') . '</option>';
+        echo '</select>';
+        echo '</p>';
 
         /* Hidden fields */
         wp_nonce_field('wpu_polls_post_form', 'wpu_polls_post_form_nonce');
@@ -336,6 +349,9 @@ class WPUPolls {
         if (isset($_POST['wpu_polls_question'])) {
             update_post_meta($post_id, 'wpu_polls__question', esc_html($_POST['wpu_polls_question']));
         }
+        if (isset($_POST['wpu_polls_nbanswers'])) {
+            update_post_meta($post_id, 'wpu_polls__nbanswers', esc_html($_POST['wpu_polls_nbanswers']));
+        }
 
         wp_update_post(array(
             'ID' => $post_id,
@@ -350,25 +366,42 @@ class WPUPolls {
 
     /* Add vote */
 
-    private function add_vote($poll_id, $answer_id) {
-        if (!is_numeric($poll_id)) {
-            return;
+    private function add_votes($poll_id, $answers_ids) {
+        if (!is_numeric($poll_id) || !is_array($answers_ids)) {
+            return false;
         }
+
+        $answers_ids = array_unique($answers_ids);
+
         $answers = get_post_meta($poll_id, 'wpu_polls__answers', 1);
-        $answer_found = false;
+
+        /* If more than a response : check if poll is multi answers */
+        $nbanswers = get_post_meta($poll_id, 'wpu_polls__nbanswers', 1);
+        if (count($answers_ids) > $nbanswers || count($answers) < count($answers_ids)) {
+            return false;
+        }
+
+        $accepted_answers = array();
         foreach ($answers as $answer) {
-            if ($answer['uniqid'] == $answer_id) {
-                $answer_found = true;
+            $accepted_answers[] = $answer['uniqid'];
+        }
+
+        $answer_found = true;
+        foreach ($answers_ids as $answer_id) {
+            if (!in_array($answer_id, $accepted_answers)) {
+                $answer_found = false;
             }
         }
         if (!$answer_found) {
             return false;
         }
-
-        return $this->baseadmindatas->create_line(array(
-            'post_id' => $poll_id,
-            'answer_id' => esc_html($answer_id)
-        ));
+        foreach ($answers_ids as $answer_id) {
+            $this->baseadmindatas->create_line(array(
+                'post_id' => $poll_id,
+                'answer_id' => esc_html($answer_id)
+            ));
+        }
+        return true;
     }
 
     /* Get votes */
@@ -425,11 +458,10 @@ class WPUPolls {
     ---------------------------------------------------------- */
 
     public function ajax_action() {
-        if (!isset($_POST['poll_id'], $_POST['answer'])) {
+        if (!isset($_POST['poll_id'], $_POST['answers'])) {
             wp_send_json_error();
         }
-        $add_vote = $this->add_vote($_POST['poll_id'], $_POST['answer']);
-        if (!$add_vote) {
+        if (!$this->add_votes($_POST['poll_id'], $_POST['answers'])) {
             wp_send_json_error();
         }
         wp_send_json($this->get_votes_for_poll($_POST['poll_id'], 1));
@@ -448,6 +480,10 @@ class WPUPolls {
     }
 
     private function get_vote_content($poll_id) {
+        $nbanswers = get_post_meta($poll_id, 'wpu_polls__nbanswers', 1);
+        if (!$nbanswers) {
+            $nbanswers = 1;
+        }
         $question = get_post_meta($poll_id, 'wpu_polls__question', 1);
         $answers = $this->get_post_answers($poll_id, array(
             'image_size' => 'medium'
@@ -469,7 +505,7 @@ class WPUPolls {
 
             /* Main */
             $html_main .= '<li class="wpu-poll-main__answer">';
-            $html_main .= $this->get_vote_content__item_main($answer_id, $answer);
+            $html_main .= $this->get_vote_content__item_main($answer_id, $answer, $nbanswers == 1 ? 'radio' : 'checkbox');
             $html_main .= '</li>';
 
             /* Results */
@@ -506,13 +542,13 @@ class WPUPolls {
 
     }
 
-    function get_vote_content__item_main($answer_id, $answer) {
+    function get_vote_content__item_main($answer_id, $answer, $type = 'checkbox') {
         $html_main = '';
         if ($answer['imagepreview']) {
             $html_main .= '<label class="part-image" for="' . $answer_id . '">' . $answer['imagepreview'] . '</label>';
         }
         $html_main .= '<div class="answer__inner">';
-        $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="radio" name="answer" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
+        $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="' . $type . '" name="answers" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
         $html_main .= '</div>';
         return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);
     }
