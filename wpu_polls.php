@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.5.0
+Version: 0.6.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.5.0';
+    private $plugin_version = '0.6.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -196,6 +196,19 @@ class WPUPolls {
         }
         $answers = $this->get_post_answers($post->ID);
 
+        echo '<h3>' . __('Settings', 'wpu_polls') . '</h3>';
+
+        /* Number of answers */
+        echo '<p>';
+        echo '<label for="wpu-polls-nbanswers">' . __('Number of answers:', 'wpu_polls') . '</label> ';
+        echo '<select name="wpu_polls_nbanswers" id="wpu-polls-nbanswers">';
+        echo '<option ' . ($nbanswers == 1 ? 'selected' : '') . ' value="1">1</option>';
+        echo '<option ' . ($nbanswers == 99 ? 'selected' : '') . ' value="99">' . __('Multiple', 'wpu_polls') . '</option>';
+        echo '</select>';
+        echo '</p>';
+
+        echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
+
         /* Question */
         echo '<p>';
         echo '<label for="wpu-polls-question">' . __('Question:', 'wpu_polls') . '</label>';
@@ -219,14 +232,30 @@ class WPUPolls {
         /* Add a line */
         echo '<p style="text-align:right"><button class="button button-primary button-large" type="button" id="wpu-polls-answer-add-line">' . __('Add an answer', 'wpu_polls') . '</button></p>';
 
-        /* Number of answers */
-        echo '<p>';
-        echo '<label for="wpu-polls-nbanswers">' . __('Number of answers:', 'wpu_polls') . '</label> ';
-        echo '<select name="wpu_polls_nbanswers" id="wpu-polls-nbanswers">';
-        echo '<option ' . ($nbanswers == 1 ? 'selected' : '') . ' value="1">1</option>';
-        echo '<option ' . ($nbanswers == 99 ? 'selected' : '') . ' value="99">' . __('Multiple', 'wpu_polls') . '</option>';
-        echo '</select>';
-        echo '</p>';
+        echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
+        $answers = $this->get_post_answers(get_the_ID());
+        $results = $this->get_votes_for_poll(get_the_ID());
+        if (is_array($results['results']) && $results['nb_votes']) {
+            echo '<ul>';
+            foreach ($answers as $answer) {
+                $nb_votes = 0;
+                $nb_votes_str = __('No vote', 'wpu_polls');
+                if (isset($results['results'][$answer['uniqid']])) {
+                    $nb_votes_str = __('1 vote', 'wpu_polls');
+                    $nb_votes = $results['results'][$answer['uniqid']];
+                    if ($nb_votes > 1) {
+                        $nb_votes_str = sprintf(__('%d votes', 'wpu_polls'), $nb_votes);
+                    }
+                }
+                echo '<li>';
+                echo '<strong>' . $answer['answer'] . '</strong> - ';
+                echo ($nb_votes / $results['nb_votes'] * 100) . '% - ';
+                echo $nb_votes_str;
+                echo '</li>';
+            }
+
+            echo '</ul>';
+        }
 
         /* Hidden fields */
         wp_nonce_field('wpu_polls_post_form', 'wpu_polls_post_form_nonce');

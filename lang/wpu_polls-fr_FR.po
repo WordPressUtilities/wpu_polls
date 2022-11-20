@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2022-11-19 19:52+0100\n"
+"POT-Creation-Date: 2022-11-20 18:09+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -41,15 +41,15 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:115
+#: wpu_polls.php:115 wpu_polls.php:242
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:116
+#: wpu_polls.php:116 wpu_polls.php:244
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:117
+#: wpu_polls.php:117 wpu_polls.php:247
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
@@ -58,7 +58,7 @@ msgstr "%d votes"
 msgid "Polls"
 msgstr "Sondages"
 
-#: wpu_polls.php:129 wpu_polls.php:131
+#: wpu_polls.php:129 wpu_polls.php:131 wpu_polls.php:210
 msgid "Poll"
 msgstr "Sondage"
 
@@ -126,48 +126,53 @@ msgstr "Navigation dans la liste des sondages"
 msgid "Polls list"
 msgstr "Liste des sondages"
 
-#: wpu_polls.php:201
-msgid "Question:"
-msgstr "Question :"
+#: wpu_polls.php:199
+msgid "Settings"
+msgstr "Réglages"
 
-#: wpu_polls.php:209
-msgid "Image"
-msgstr "Image"
-
-#: wpu_polls.php:210
-msgid "Answer"
-msgstr "Réponse"
-
-#: wpu_polls.php:220
-msgid "Add an answer"
-msgstr "Ajouter une réponse"
-
-#: wpu_polls.php:224
+#: wpu_polls.php:203
 msgid "Number of answers:"
 msgstr "Nombre de réponses :"
 
-#: wpu_polls.php:227
+#: wpu_polls.php:206
 msgid "Multiple"
 msgstr "Multiple"
 
-#: wpu_polls.php:246
+#: wpu_polls.php:214
+msgid "Question:"
+msgstr "Question :"
+
+#: wpu_polls.php:222
+msgid "Image"
+msgstr "Image"
+
+#: wpu_polls.php:223
+msgid "Answer"
+msgstr "Réponse"
+
+#: wpu_polls.php:233
+msgid "Add an answer"
+msgstr "Ajouter une réponse"
+
+#: wpu_polls.php:235
+msgid "Results"
+msgstr "Résultats"
+
+#: wpu_polls.php:275
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:247
+#: wpu_polls.php:276
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:251
+#: wpu_polls.php:280
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:528
+#: wpu_polls.php:557
 msgid "Submit"
 msgstr "Envoyer"
-
-#~ msgid "Import Settings"
-#~ msgstr "wp"
 
 #~ msgid "New Post"
 #~ msgstr "Nouvel article"
