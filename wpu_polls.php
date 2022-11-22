@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.6.0
+Version: 0.6.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.6.0';
+    private $plugin_version = '0.6.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -80,12 +80,20 @@ class WPUPolls {
             'plugin_name' => $this->plugin_settings['name'],
             'plugin_id' => $this->plugin_settings['id'],
             'option_id' => $this->plugin_settings['id'] . '_options',
-            'sections' => array()
+            'sections' => array(
+                'default' => array(
+                    'name' => __('Settings', 'wpu_polls')
+                )
+            )
         );
         $this->settings = array(
             'public' => array(
                 'label' => __('Public post type', 'wpu_polls'),
-                'type' => 'radio'
+                'type' => 'radio',
+                'datas' => array(
+                    __('No', 'wpu_polls'),
+                    __('Yes', 'wpu_polls')
+                )
             )
         );
         include dirname(__FILE__) . '/inc/WPUBaseSettings/WPUBaseSettings.php';
@@ -232,10 +240,10 @@ class WPUPolls {
         /* Add a line */
         echo '<p style="text-align:right"><button class="button button-primary button-large" type="button" id="wpu-polls-answer-add-line">' . __('Add an answer', 'wpu_polls') . '</button></p>';
 
-        echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
         $answers = $this->get_post_answers(get_the_ID());
         $results = $this->get_votes_for_poll(get_the_ID());
         if (is_array($results['results']) && $results['nb_votes']) {
+            echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
             echo '<ul>';
             foreach ($answers as $answer) {
                 $nb_votes = 0;
