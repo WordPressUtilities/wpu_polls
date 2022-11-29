@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.6.1
+Version: 0.7.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.6.1';
+    private $plugin_version = '0.7.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -208,9 +208,11 @@ class WPUPolls {
 
         /* Number of answers */
         echo '<p>';
-        echo '<label for="wpu-polls-nbanswers">' . __('Number of answers:', 'wpu_polls') . '</label> ';
+        echo '<label for="wpu-polls-nbanswers">' . __('Max number of answers:', 'wpu_polls') . '</label> ';
         echo '<select name="wpu_polls_nbanswers" id="wpu-polls-nbanswers">';
-        echo '<option ' . ($nbanswers == 1 ? 'selected' : '') . ' value="1">1</option>';
+        for ($i = 1; $i < 10; $i++) {
+            echo '<option ' . ($nbanswers == $i ? 'selected' : '') . ' value="' . $i . '">' . $i . '</option>';
+        }
         echo '<option ' . ($nbanswers == 99 ? 'selected' : '') . ' value="99">' . __('Multiple', 'wpu_polls') . '</option>';
         echo '</select>';
         echo '</p>';
@@ -552,7 +554,7 @@ class WPUPolls {
         }
 
         /* Wrapper start */
-        $html = '<div class="wpu-poll-main__wrapper"  data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
+        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
 
         /* Questions */
         $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';

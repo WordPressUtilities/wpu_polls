@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2022-11-22 10:41+0100\n"
+"POT-Creation-Date: 2022-11-29 20:43+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -53,15 +53,15 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:123 wpu_polls.php:250
+#: wpu_polls.php:123 wpu_polls.php:252
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:124 wpu_polls.php:252
+#: wpu_polls.php:124 wpu_polls.php:254
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:125 wpu_polls.php:255
+#: wpu_polls.php:125 wpu_polls.php:257
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
@@ -70,7 +70,7 @@ msgstr "%d votes"
 msgid "Polls"
 msgstr "Sondages"
 
-#: wpu_polls.php:137 wpu_polls.php:139 wpu_polls.php:218
+#: wpu_polls.php:137 wpu_polls.php:139 wpu_polls.php:220
 msgid "Poll"
 msgstr "Sondage"
 
@@ -139,46 +139,46 @@ msgid "Polls list"
 msgstr "Liste des sondages"
 
 #: wpu_polls.php:211
-msgid "Number of answers:"
-msgstr "Nombre de réponses :"
+msgid "Max number of answers:"
+msgstr "Nombre maximum de réponses :"
 
-#: wpu_polls.php:214
+#: wpu_polls.php:216
 msgid "Multiple"
 msgstr "Multiple"
 
-#: wpu_polls.php:222
+#: wpu_polls.php:224
 msgid "Question:"
 msgstr "Question :"
 
-#: wpu_polls.php:230
+#: wpu_polls.php:232
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:231
+#: wpu_polls.php:233
 msgid "Answer"
 msgstr "Réponse"
 
-#: wpu_polls.php:241
+#: wpu_polls.php:243
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:246
+#: wpu_polls.php:248
 msgid "Results"
 msgstr "Résultats"
 
-#: wpu_polls.php:283
+#: wpu_polls.php:285
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:284
+#: wpu_polls.php:286
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:288
+#: wpu_polls.php:290
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:565
+#: wpu_polls.php:567
 msgid "Submit"
 msgstr "Envoyer"
 

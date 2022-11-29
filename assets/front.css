@@ -46,6 +46,14 @@
     padding: 0.5em;
 }
 
+[data-max-answers-locked="1"] .wpu-poll-main__answer:not([data-checked="1"]) {
+    opacity: 0.50;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
 /* ----------------------------------------------------------
   Results
 ---------------------------------------------------------- */

@@ -26,6 +26,27 @@ document.addEventListener('DOMContentLoaded', function() {
         update_all_polls();
     }, 10000);
 
+    /* Limit to checkboxes */
+    jQuery('.wpu-poll-main__wrapper[data-nb-answers] .wpu-poll-main__answers').on('change', 'input[type="checkbox"]', function() {
+        var $this = jQuery(this),
+            $wrapper = $this.closest('.wpu-poll-main__wrapper'),
+            _maxNb = parseInt($wrapper.attr('data-nb-answers'), 10);
+        var _checkedBoxes = $wrapper.find('.wpu-poll-main__answers input[type="checkbox"]:checked').length;
+
+        /* Prevent selecting too many answers */
+        if (_checkedBoxes > _maxNb) {
+            $this.prop('checked', false);
+        }
+
+        /* Visual indicator */
+        $wrapper.attr('data-max-answers-locked', (_checkedBoxes >= _maxNb) ? 1 : 0);
+    });
+
+    jQuery('.wpu-poll-main__wrapper .wpu-poll-main__answers').on('change', 'input[type="checkbox"], input[type="checkbox"]', function() {
+        var $this = jQuery(this);
+        $this.closest('.wpu-poll-main__answer').attr('data-checked', $this.prop('checked') ? '1' : '0');
+    });
+
     /* Vote */
     jQuery('.wpu-poll-main__submit button').on('click', function(e) {
         e.preventDefault();
@@ -44,8 +65,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!$checkboxes.length) {
             return false;
         }
+
         var _values = [];
-        $checkboxes.each(function(){
+        $checkboxes.each(function() {
             _values.push(jQuery(this).val());
         });
 
