@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2022-11-29 20:43+0100\n"
+"POT-Creation-Date: 2023-01-09 16:17+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,7 +12,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_x;_e\n"
-"X-Generator: Poedit 3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: inc/WPUBaseAdminDatas\n"
 "X-Poedit-SearchPathExcluded-1: inc/WPUBaseSettings\n"
@@ -53,15 +53,15 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:123 wpu_polls.php:252
+#: wpu_polls.php:123 wpu_polls.php:253
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:124 wpu_polls.php:254
+#: wpu_polls.php:124 wpu_polls.php:255
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:125 wpu_polls.php:257
+#: wpu_polls.php:125 wpu_polls.php:258
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
@@ -154,7 +154,7 @@ msgstr "Question :"
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:233
+#: wpu_polls.php:233 wpu_polls.php:279
 msgid "Answer"
 msgstr "Réponse"
 
@@ -162,23 +162,31 @@ msgstr "Réponse"
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:248
+#: wpu_polls.php:276
 msgid "Results"
 msgstr "Résultats"
 
-#: wpu_polls.php:285
+#: wpu_polls.php:280
+msgid "Votes"
+msgstr "Votes"
+
+#: wpu_polls.php:281
+msgid "Percent"
+msgstr "Pourcent"
+
+#: wpu_polls.php:311
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:286
+#: wpu_polls.php:312
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:290
+#: wpu_polls.php:316
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:567
+#: wpu_polls.php:593
 msgid "Submit"
 msgstr "Envoyer"
 

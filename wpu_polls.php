@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.7.0
+Version: 0.7.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.7.0';
+    private $plugin_version = '0.7.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -244,9 +244,10 @@ class WPUPolls {
 
         $answers = $this->get_post_answers(get_the_ID());
         $results = $this->get_votes_for_poll(get_the_ID());
+        $answers_display = array();
+
         if (is_array($results['results']) && $results['nb_votes']) {
-            echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
-            echo '<ul>';
+
             foreach ($answers as $answer) {
                 $nb_votes = 0;
                 $nb_votes_str = __('No vote', 'wpu_polls');
@@ -257,14 +258,39 @@ class WPUPolls {
                         $nb_votes_str = sprintf(__('%d votes', 'wpu_polls'), $nb_votes);
                     }
                 }
-                echo '<li>';
-                echo '<strong>' . $answer['answer'] . '</strong> - ';
-                echo ($nb_votes / $results['nb_votes'] * 100) . '% - ';
-                echo $nb_votes_str;
-                echo '</li>';
-            }
+                $answers_display[] = array(
+                    'answer' => $answer['answer'],
+                    'votes' => $nb_votes,
+                    'votes_str' => $nb_votes_str,
+                    'percent' => ($nb_votes / $results['nb_votes'] * 100) . '%.'
+                );
 
-            echo '</ul>';
+            }
+        }
+
+        usort($answers_display, function($a,$b){
+            return $b['votes'] - $a['votes'];
+        });
+
+        if (!empty($answers_display)) {
+            echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
+            echo '<table contenteditable class="widefat striped">';
+            echo '<thead>';
+            echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
+            echo '<th>' . __('Votes', 'wpu_polls') . '</th>';
+            echo '<th>' . __('Percent', 'wpu_polls') . '</th>';
+            echo '</thead>';
+            echo '<tbody>';
+            foreach ($answers_display as $answer) {
+                echo '<tr>';
+                echo '<td>' . $answer['answer'] . '</td>';
+                echo '<td>' . $answer['votes_str'] . '</td>';
+                echo '<td>' . $answer['percent'] . '</td>';
+                echo '</tr>';
+            }
+            echo '</tbody>';
+
+            echo '</table>';
         }
 
         /* Hidden fields */
