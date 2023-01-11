@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.7.1
+Version: 0.7.2
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.7.1';
+    private $plugin_version = '0.7.2';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -46,6 +46,8 @@ class WPUPolls {
         add_action('wp_ajax_nopriv_wpu_polls_answer', array(&$this, 'ajax_action'));
         add_action('wp_ajax_wpu_polls_answer', array(&$this, 'ajax_action'));
 
+        /* After settings */
+        add_action('wpubasesettings_before_wrap_endsettings_page_wpu_polls', array(&$this, 'wpubasesettings_before_wrap_endsettings_page_wpu_polls'));
     }
 
     public function plugins_loaded() {
@@ -189,6 +191,19 @@ class WPUPolls {
         }
     }
 
+    function wpubasesettings_before_wrap_endsettings_page_wpu_polls() {
+        $settings = $this->settings_obj->get_settings();
+        if (!is_array($settings) || !isset($settings['public'])) {
+            return;
+        }
+        $opt_id = 'wpu_polls__cached_options_public';
+        $opt_val = get_option($opt_id);
+        if ($opt_val !== $settings['public']) {
+            flush_rewrite_rules();
+            update_option($opt_id, $settings['public'], false);
+        }
+    }
+
     /* ----------------------------------------------------------
       Edit & Save post
     ---------------------------------------------------------- */
@@ -268,7 +283,7 @@ class WPUPolls {
             }
         }
 
-        usort($answers_display, function($a,$b){
+        usort($answers_display, function ($a, $b) {
             return $b['votes'] - $a['votes'];
         });
 
