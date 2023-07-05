@@ -95,6 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function wpu_poll_build_results($wrapper, response) {
         var $answers = $wrapper.find('.wpu-poll-results'),
+            $questions = $wrapper.find('.wpu-poll-main__answers'),
+            _max_nb = parseInt($wrapper.attr('data-nb-votes-max'), 10),
+            _nb_votes_available,
             $tmp_item,
             _percent;
 
@@ -104,12 +107,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         for (var answer_id in response.results) {
+            /* Answers */
             $tmp_item = $answers.find('[data-results-id="' + answer_id + '"]');
-            if (!$tmp_item.length) {
-                continue;
+            if ($tmp_item.length) {
+                _percent = Math.round(response.results[answer_id] / response.nb_votes * 100);
+                wpu_poll_build_results_item($tmp_item, response.results[answer_id], _percent);
             }
-            _percent = Math.round(response.results[answer_id] / response.nb_votes * 100);
-            wpu_poll_build_results_item($tmp_item, response.results[answer_id], _percent);
+            /* Questions */
+            $tmp_item = $questions.find('[data-results-id="' + answer_id + '"]');
+            if (_max_nb < 99 && $tmp_item.length && response.results[answer_id]) {
+                _nb_votes_available = Math.max(0, _max_nb - response.results[answer_id]);
+                $tmp_item.find('.nbvotesmax_value').text(_nb_votes_available);
+                if (_nb_votes_available < 1) {
+                    $tmp_item.attr('data-disabled', 1);
+                    $tmp_item.find('input[type="checkbox"]').prop('disabled', 1);
+                }
+            }
         }
     }
 

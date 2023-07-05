@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.7.2
+Version: 0.8.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,11 +14,12 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.7.2';
+    private $plugin_version = '0.8.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
     );
+    private $nb_max = 999999999999;
     private $settings_obj;
 
     public function __construct() {
@@ -213,24 +214,28 @@ class WPUPolls {
 
     public function edit_page_poll($post) {
         $question = get_post_meta($post->ID, 'wpu_polls__question', 1);
-        $nbanswers = get_post_meta($post->ID, 'wpu_polls__nbanswers', 1);
-        if (!$nbanswers) {
-            $nbanswers = 1;
-        }
+
         $answers = $this->get_post_answers($post->ID);
 
         echo '<h3>' . __('Settings', 'wpu_polls') . '</h3>';
 
-        /* Number of answers */
-        echo '<p>';
-        echo '<label for="wpu-polls-nbanswers">' . __('Max number of answers:', 'wpu_polls') . '</label> ';
-        echo '<select name="wpu_polls_nbanswers" id="wpu-polls-nbanswers">';
-        for ($i = 1; $i < 10; $i++) {
-            echo '<option ' . ($nbanswers == $i ? 'selected' : '') . ' value="' . $i . '">' . $i . '</option>';
-        }
-        echo '<option ' . ($nbanswers == 99 ? 'selected' : '') . ' value="99">' . __('Multiple', 'wpu_polls') . '</option>';
-        echo '</select>';
-        echo '</p>';
+        /* Number of choices */
+        echo $this->get_template_select(array(
+            'post_id' => $post->ID,
+            'default_value' => 1,
+            'meta_key' => 'wpu_polls__nbanswers',
+            'post_key' => 'wpu_polls_nbanswers',
+            'id' => 'wpu-polls-nbanswers',
+            'label' => __('User can choose this number of answers :', 'wpu_polls')
+        ));
+        echo $this->get_template_select(array(
+            'post_id' => $post->ID,
+            'default_value' => $this->nb_max,
+            'meta_key' => 'wpu_polls__nbvotesmax',
+            'post_key' => 'wpu_polls_nbvotesmax',
+            'id' => 'wpu-polls-nbvotesmax',
+            'label' => __('Maximum number of votes per response :', 'wpu_polls')
+        ));
 
         echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
 
@@ -313,6 +318,27 @@ class WPUPolls {
         echo '<script type="text/template" id="wpu-polls-answer-template">' . $this->get_template_answer() . '</script>';
     }
 
+    /* Select template */
+
+    private function get_template_select($args = array()) {
+        $nbanswers = get_post_meta($args['post_id'], $args['meta_key'], 1);
+        if (!$nbanswers) {
+            $nbanswers = $args['default_value'];
+        }
+        $html = '';
+        $html .= '<p>';
+        $html .= '<label for="' . $args['id'] . '">' . $args['label'] . '</label> ';
+        $html .= '<select name="' . $args['post_key'] . '" id="' . $args['id'] . '">';
+        for ($i = 1; $i < 99; $i++) {
+            $html .= '<option ' . ($nbanswers == $i ? 'selected' : '') . ' value="' . $i . '">' . $i . '</option>';
+        }
+        $html .= '<option ' . ($nbanswers >= 99 ? 'selected' : '') . ' value="' . $this->nb_max . '">' . __('Multiple', 'wpu_polls') . '</option>';
+        $html .= '</select>';
+        $html .= '</p>';
+
+        return $html;
+    }
+
     /* Answer template */
 
     private function get_template_answer($vars = array()) {
@@ -365,6 +391,15 @@ class WPUPolls {
             }
         }
         return $answers;
+    }
+
+    function get_poll_nbvotesmax($poll_id) {
+        /* Get number of votes */
+        $nbvotesmax = get_post_meta($poll_id, 'wpu_polls__nbvotesmax', 1);
+        if (!$nbvotesmax) {
+            $nbvotesmax = $this->nb_max;
+        }
+        return intval($nbvotesmax, 10);
     }
 
     /* Save poll
@@ -426,11 +461,14 @@ class WPUPolls {
         update_post_meta($post_id, 'wpu_polls__answers', $answers);
 
         /* Save question */
-        if (isset($_POST['wpu_polls_question'])) {
+        if (isset($_POST['wpu_polls_question']) && ctype_digit($_POST['wpu_polls_question'])) {
             update_post_meta($post_id, 'wpu_polls__question', esc_html($_POST['wpu_polls_question']));
         }
-        if (isset($_POST['wpu_polls_nbanswers'])) {
+        if (isset($_POST['wpu_polls_nbanswers']) && ctype_digit($_POST['wpu_polls_nbanswers'])) {
             update_post_meta($post_id, 'wpu_polls__nbanswers', esc_html($_POST['wpu_polls_nbanswers']));
+        }
+        if (isset($_POST['wpu_polls_nbvotesmax'])) {
+            update_post_meta($post_id, 'wpu_polls__nbvotesmax', esc_html($_POST['wpu_polls_nbvotesmax']));
         }
 
         wp_update_post(array(
@@ -461,20 +499,30 @@ class WPUPolls {
             return false;
         }
 
+        /* Get number of votes */
+        $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
+
+        /* Retrieve votes */
+        $votes = $this->get_votes_for_poll($poll_id);
+
+        /* Check that every answers exists */
         $accepted_answers = array();
         foreach ($answers as $answer) {
             $accepted_answers[] = $answer['uniqid'];
         }
 
-        $answer_found = true;
         foreach ($answers_ids as $answer_id) {
+            /* Answer does not exists */
             if (!in_array($answer_id, $accepted_answers)) {
-                $answer_found = false;
+                return false;
+            }
+
+            if (isset($votes['results'], $votes['results'][$answer_id]) && $votes['results'][$answer_id] >= $nbvotesmax) {
+                return false;
             }
         }
-        if (!$answer_found) {
-            return false;
-        }
+
+        /* Answer */
         foreach ($answers_ids as $answer_id) {
             $this->baseadmindatas->create_line(array(
                 'post_id' => $poll_id,
@@ -500,7 +548,10 @@ class WPUPolls {
             $new_results[$res['answer_id']] = $nb;
         }
 
+        $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
+
         $data = array(
+            'nbvotesmax' => $nbvotesmax,
             'poll_id' => $poll_id,
             'nb_votes' => $nb_votes,
             'results' => $new_results
@@ -556,7 +607,6 @@ class WPUPolls {
             return '';
         }
         return $this->get_vote_content($atts['id']);
-
     }
 
     private function get_vote_content($poll_id) {
@@ -564,6 +614,9 @@ class WPUPolls {
         if (!$nbanswers) {
             $nbanswers = 1;
         }
+
+        $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
+
         $question = get_post_meta($poll_id, 'wpu_polls__question', 1);
         $answers = $this->get_post_answers($poll_id, array(
             'image_size' => 'medium'
@@ -584,8 +637,8 @@ class WPUPolls {
             }
 
             /* Main */
-            $html_main .= '<li class="wpu-poll-main__answer">';
-            $html_main .= $this->get_vote_content__item_main($answer_id, $answer, $nbanswers == 1 ? 'radio' : 'checkbox');
+            $html_main .= '<li class="wpu-poll-main__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
+            $html_main .= $this->get_vote_content__item_main($poll_id, $answer_id, $answer, $nbanswers == 1 ? 'radio' : 'checkbox');
             $html_main .= '</li>';
 
             /* Results */
@@ -595,7 +648,7 @@ class WPUPolls {
         }
 
         /* Wrapper start */
-        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
+        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
 
         /* Questions */
         $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';
@@ -622,13 +675,17 @@ class WPUPolls {
 
     }
 
-    function get_vote_content__item_main($answer_id, $answer, $type = 'checkbox') {
+    function get_vote_content__item_main($poll_id, $answer_id, $answer, $type = 'checkbox') {
+        $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
         $html_main = '';
         if ($answer['imagepreview']) {
             $html_main .= '<label class="part-image" for="' . $answer_id . '">' . $answer['imagepreview'] . '</label>';
         }
         $html_main .= '<div class="answer__inner">';
         $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="' . $type . '" name="answers" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
+        if ($nbvotesmax < 99) {
+            $html_main .= '<span>(' . __('Available: ', 'wpu_polls') . '<span class="nbvotesmax_value">' . $nbvotesmax . '</span>)</span>';
+        }
         $html_main .= '</div>';
         return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);
     }
