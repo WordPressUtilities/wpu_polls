@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.8.0
+Version: 0.9.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.8.0';
+    private $plugin_version = '0.9.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -71,6 +71,12 @@ class WPUPolls {
                     'public_name' => 'Answer ID',
                     'type' => 'sql',
                     'sql' => 'varchar(100) DEFAULT NULL'
+                ),
+                'user_email' => array(
+                    'public_name' => 'User email'
+                ),
+                'user_name' => array(
+                    'public_name' => 'User name'
                 )
             )
         ));
@@ -236,6 +242,13 @@ class WPUPolls {
             'id' => 'wpu-polls-nbvotesmax',
             'label' => __('Maximum number of votes per response :', 'wpu_polls')
         ));
+        echo $this->get_template_checkbox(array(
+            'post_id' => $post->ID,
+            'meta_key' => 'wpu_polls__requiredetails',
+            'post_key' => 'wpu_polls_requiredetails',
+            'id' => 'wpu-polls-requiredetails',
+            'label' => __('Require user name and email to vote (use account details if loggedin)', 'wpu_polls')
+        ));
 
         echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
 
@@ -319,6 +332,17 @@ class WPUPolls {
     }
 
     /* Select template */
+
+    private function get_template_checkbox($args = array()) {
+        $value = get_post_meta($args['post_id'], $args['meta_key'], 1);
+        $html = '';
+        $html .= '<p>';
+        $html .= '<input value="1" ' . ($value ? 'checked' : '') . ' type="checkbox" name="' . $args['post_key'] . '" id="' . $args['id'] . '" />';
+        $html .= '<label for="' . $args['id'] . '">' . $args['label'] . '</label> ';
+        $html .= '</p>';
+
+        return $html;
+    }
 
     private function get_template_select($args = array()) {
         $nbanswers = get_post_meta($args['post_id'], $args['meta_key'], 1);
@@ -470,6 +494,7 @@ class WPUPolls {
         if (isset($_POST['wpu_polls_nbvotesmax'])) {
             update_post_meta($post_id, 'wpu_polls__nbvotesmax', esc_html($_POST['wpu_polls_nbvotesmax']));
         }
+        update_post_meta($post_id, 'wpu_polls__requiredetails', isset($_POST['wpu_polls_requiredetails']) ? '1' : '0');
 
         wp_update_post(array(
             'ID' => $post_id,
@@ -484,7 +509,7 @@ class WPUPolls {
 
     /* Add vote */
 
-    private function add_votes($poll_id, $answers_ids) {
+    private function add_votes($poll_id, $answers_ids, $post = array()) {
         if (!is_numeric($poll_id) || !is_array($answers_ids)) {
             return false;
         }
@@ -505,6 +530,23 @@ class WPUPolls {
         /* Retrieve votes */
         $votes = $this->get_votes_for_poll($poll_id);
 
+        /* Required */
+        $requiredetails = get_post_meta($poll_id, 'wpu_polls__requiredetails', 1);
+        if ($requiredetails == '1') {
+            /* If user is logged-in : force default values */
+            if (is_user_logged_in()) {
+                $user = get_userdata(get_current_user_id());
+                $post['user_name'] = $user->display_name;
+                $post['user_email'] = $user->user_email;
+            }
+            if (!isset($post['user_name']) || empty($post['user_name'])) {
+                return false;
+            }
+            if (!isset($post['user_email']) || empty($post['user_email']) || !is_email($post['user_email'])) {
+                return false;
+            }
+        }
+
         /* Check that every answers exists */
         $accepted_answers = array();
         foreach ($answers as $answer) {
@@ -524,10 +566,15 @@ class WPUPolls {
 
         /* Answer */
         foreach ($answers_ids as $answer_id) {
-            $this->baseadmindatas->create_line(array(
+            $answer_data = array(
                 'post_id' => $poll_id,
                 'answer_id' => esc_html($answer_id)
-            ));
+            );
+            if ($requiredetails == '1') {
+                $answer_data['user_email'] = $post['user_email'];
+                $answer_data['user_name'] = $post['user_name'];
+            }
+            $this->baseadmindatas->create_line($answer_data);
         }
         return true;
     }
@@ -592,7 +639,7 @@ class WPUPolls {
         if (!isset($_POST['poll_id'], $_POST['answers'])) {
             wp_send_json_error();
         }
-        if (!$this->add_votes($_POST['poll_id'], $_POST['answers'])) {
+        if (!$this->add_votes($_POST['poll_id'], $_POST['answers'], $_POST)) {
             wp_send_json_error();
         }
         wp_send_json($this->get_votes_for_poll($_POST['poll_id'], 1));
@@ -615,6 +662,8 @@ class WPUPolls {
             $nbanswers = 1;
         }
 
+        $requiredetails = get_post_meta($poll_id, 'wpu_polls__requiredetails', 1);
+
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
         $question = get_post_meta($poll_id, 'wpu_polls__question', 1);
@@ -627,11 +676,13 @@ class WPUPolls {
 
         $results = $this->get_votes_for_poll($poll_id, 1);
 
+        $id_prefix = 'answer__' . $poll_id . '__';
+
         $html_main = '';
         $html_results = '';
         $has_answer_image = false;
         foreach ($answers as $answer) {
-            $answer_id = 'answer__' . $poll_id . '__' . $answer['uniqid'];
+            $answer_id = $id_prefix . $answer['uniqid'];
             if ($answer['imagepreview']) {
                 $has_answer_image = true;
             }
@@ -648,7 +699,7 @@ class WPUPolls {
         }
 
         /* Wrapper start */
-        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
+        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-required-details="' . ($requiredetails ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
 
         /* Questions */
         $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';
@@ -658,6 +709,25 @@ class WPUPolls {
         $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '" class="wpu-poll-main__answers">';
         $html .= $html_main;
         $html .= '</ul>';
+
+        if ($requiredetails == '1') {
+            $user_name = '';
+            $user_email = '';
+            $readonly = '';
+            $label_extra = '<em>*</em>';
+            if (is_user_logged_in()) {
+                $user = get_userdata(get_current_user_id());
+                $user_name = $user->display_name;
+                $user_email = $user->user_email;
+                $label_extra = '';
+                $readonly = 'readonly';
+            }
+            $html .= '<div class="wpu-polls-require-details-area">';
+            $html .= '<p><label for="' . $id_prefix . '_name">' . __('Name', 'wpu_polls') . $label_extra . '</label><input required ' . $readonly . ' value="' . esc_attr($user_name) . '" id="' . $id_prefix . '_name" name="user_name" type="text" /></p>';
+            $html .= '<p><label for="' . $id_prefix . '_email">' . __('Email', 'wpu_polls') . $label_extra . '</label><input required ' . $readonly . ' value="' . esc_attr($user_email) . '" id="' . $id_prefix . '_email" name="user_email" type="email" /></p>';
+            $html .= '</div>';
+        }
+
         $html .= '<p class="wpu-poll-main__submit"><button type="button"><span>' . __('Submit', 'wpu_polls') . '</span></button></p>';
         $html .= '</div>';
 
