@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.9.0
+Version: 0.10.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.9.0';
+    private $plugin_version = '0.10.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -248,6 +248,13 @@ class WPUPolls {
             'post_key' => 'wpu_polls_requiredetails',
             'id' => 'wpu-polls-requiredetails',
             'label' => __('Require user name and email to vote (use account details if loggedin)', 'wpu_polls')
+        ));
+        echo $this->get_template_checkbox(array(
+            'post_id' => $post->ID,
+            'meta_key' => 'wpu_polls__displaymessage',
+            'post_key' => 'wpu_polls_displaymessage',
+            'id' => 'wpu-polls-displaymessage',
+            'label' => __('Display a message after vote instead of the results', 'wpu_polls')
         ));
 
         echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
@@ -495,6 +502,7 @@ class WPUPolls {
             update_post_meta($post_id, 'wpu_polls__nbvotesmax', esc_html($_POST['wpu_polls_nbvotesmax']));
         }
         update_post_meta($post_id, 'wpu_polls__requiredetails', isset($_POST['wpu_polls_requiredetails']) ? '1' : '0');
+        update_post_meta($post_id, 'wpu_polls__displaymessage', isset($_POST['wpu_polls_displaymessage']) ? '1' : '0');
 
         wp_update_post(array(
             'ID' => $post_id,
@@ -663,6 +671,7 @@ class WPUPolls {
         }
 
         $requiredetails = get_post_meta($poll_id, 'wpu_polls__requiredetails', 1);
+        $displaymessage = get_post_meta($poll_id, 'wpu_polls__displaymessage', 1);
 
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
@@ -732,11 +741,17 @@ class WPUPolls {
         $html .= '</div>';
 
         /* Results */
-        $html .= '<div class="wpu-poll-results">';
-        $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
-        $html .= $html_results;
-        $html .= '</ul>';
-        $html .= '</div>';
+        if ($displaymessage) {
+            $html .= '<div class="wpu-poll-success-message">';
+            $html .= '<p>' . apply_filters('wpu_polls__success_message', __('Thank you for your vote !', 'wpu_polls')) . '</p>';
+            $html .= '</div>';
+        } else {
+            $html .= '<div class="wpu-poll-results">';
+            $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
+            $html .= $html_results;
+            $html .= '</ul>';
+            $html .= '</div>';
+        }
 
         /* Wrapper end */
         $html .= '</div>';

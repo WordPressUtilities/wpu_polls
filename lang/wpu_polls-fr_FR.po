@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2023-07-06 18:46+0200\n"
+"POT-Creation-Date: 2023-07-06 21:02+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -53,15 +53,15 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:132 wpu_polls.php:286
+#: wpu_polls.php:132 wpu_polls.php:293
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:133 wpu_polls.php:288
+#: wpu_polls.php:133 wpu_polls.php:295
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:134 wpu_polls.php:291
+#: wpu_polls.php:134 wpu_polls.php:298
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
@@ -70,7 +70,7 @@ msgstr "%d votes"
 msgid "Polls"
 msgstr "Sondages"
 
-#: wpu_polls.php:146 wpu_polls.php:148 wpu_polls.php:253
+#: wpu_polls.php:146 wpu_polls.php:148 wpu_polls.php:260
 msgid "Poll"
 msgstr "Sondage"
 
@@ -148,65 +148,75 @@ msgstr "Nombre maximum de votes par réponse :"
 
 #: wpu_polls.php:250
 msgid "Require user name and email to vote (use account details if loggedin)"
-msgstr "Le nom d’utilisateur et l’adresse e-mail sont requis pour voter (utilise les détails du compte utilisateur si connecté)"
+msgstr ""
+"Le nom d’utilisateur et l’adresse e-mail sont requis pour voter (utilise les "
+"détails du compte utilisateur si connecté)"
 
 #: wpu_polls.php:257
+msgid "Display a message after vote instead of the results"
+msgstr "Afficher un message après le vote au lieu des résultats"
+
+#: wpu_polls.php:264
 msgid "Question:"
 msgstr "Question :"
 
-#: wpu_polls.php:265
+#: wpu_polls.php:272
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:266 wpu_polls.php:312
+#: wpu_polls.php:273 wpu_polls.php:319
 msgid "Answer"
 msgstr "Réponse"
 
-#: wpu_polls.php:276
+#: wpu_polls.php:283
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:309
+#: wpu_polls.php:316
 msgid "Results"
 msgstr "Résultats"
 
-#: wpu_polls.php:313
+#: wpu_polls.php:320
 msgid "Votes"
 msgstr "Votes"
 
-#: wpu_polls.php:314
+#: wpu_polls.php:321
 msgid "Percent"
 msgstr "Pourcent"
 
-#: wpu_polls.php:359
+#: wpu_polls.php:366
 msgid "Multiple"
 msgstr "Multiple"
 
-#: wpu_polls.php:376
+#: wpu_polls.php:383
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:377
+#: wpu_polls.php:384
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:381
+#: wpu_polls.php:388
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:726
+#: wpu_polls.php:735
 msgid "Name"
 msgstr "Nom"
 
-#: wpu_polls.php:727
+#: wpu_polls.php:736
 msgid "Email"
 msgstr "E-mail"
 
-#: wpu_polls.php:731
+#: wpu_polls.php:740
 msgid "Submit"
 msgstr "Envoyer"
 
-#: wpu_polls.php:757
+#: wpu_polls.php:746
+msgid "Thank you for your vote !"
+msgstr "Merci pour votre vote !"
+
+#: wpu_polls.php:773
 msgid "Available: "
 msgstr "Disponible: "
 
