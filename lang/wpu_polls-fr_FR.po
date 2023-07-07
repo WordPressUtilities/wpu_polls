@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2023-07-06 21:02+0200\n"
+"POT-Creation-Date: 2023-07-07 21:28+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -164,7 +164,7 @@ msgstr "Question :"
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:273 wpu_polls.php:319
+#: wpu_polls.php:273 wpu_polls.php:329 wpu_polls.php:355
 msgid "Answer"
 msgstr "Réponse"
 
@@ -172,51 +172,51 @@ msgstr "Réponse"
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:316
-msgid "Results"
-msgstr "Résultats"
-
-#: wpu_polls.php:320
+#: wpu_polls.php:326 wpu_polls.php:356
 msgid "Votes"
 msgstr "Votes"
 
-#: wpu_polls.php:321
-msgid "Percent"
-msgstr "Pourcent"
-
-#: wpu_polls.php:366
-msgid "Multiple"
-msgstr "Multiple"
-
-#: wpu_polls.php:383
-msgid "Add an image"
-msgstr "Ajouter une image"
-
-#: wpu_polls.php:384
-msgid "Remove this image"
-msgstr "Retirer cette image"
-
-#: wpu_polls.php:388
-msgid "Delete this reply"
-msgstr "Supprimer cette réponse"
-
-#: wpu_polls.php:735
+#: wpu_polls.php:330 wpu_polls.php:772
 msgid "Name"
 msgstr "Nom"
 
-#: wpu_polls.php:736
+#: wpu_polls.php:331 wpu_polls.php:773
 msgid "Email"
 msgstr "E-mail"
 
-#: wpu_polls.php:740
+#: wpu_polls.php:352
+msgid "Results"
+msgstr "Résultats"
+
+#: wpu_polls.php:357
+msgid "Percent"
+msgstr "Pourcent"
+
+#: wpu_polls.php:403
+msgid "Multiple"
+msgstr "Multiple"
+
+#: wpu_polls.php:420
+msgid "Add an image"
+msgstr "Ajouter une image"
+
+#: wpu_polls.php:421
+msgid "Remove this image"
+msgstr "Retirer cette image"
+
+#: wpu_polls.php:425
+msgid "Delete this reply"
+msgstr "Supprimer cette réponse"
+
+#: wpu_polls.php:777
 msgid "Submit"
 msgstr "Envoyer"
 
-#: wpu_polls.php:746
+#: wpu_polls.php:783
 msgid "Thank you for your vote !"
 msgstr "Merci pour votre vote !"
 
-#: wpu_polls.php:773
+#: wpu_polls.php:809
 msgid "Available: "
 msgstr "Disponible: "
 

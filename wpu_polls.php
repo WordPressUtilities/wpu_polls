@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.10.0
+Version: 0.11.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.10.0';
+    private $plugin_version = '0.11.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -299,6 +299,7 @@ class WPUPolls {
                     }
                 }
                 $answers_display[] = array(
+                    'uniqid' => $answer['uniqid'],
                     'answer' => $answer['answer'],
                     'votes' => $nb_votes,
                     'votes_str' => $nb_votes_str,
@@ -308,29 +309,65 @@ class WPUPolls {
             }
         }
 
-        usort($answers_display, function ($a, $b) {
-            return $b['votes'] - $a['votes'];
-        });
+        $requiredetails = get_post_meta($post->ID, 'wpu_polls__requiredetails', 1);
+
+        if (!$requiredetails) {
+            usort($answers_display, function ($a, $b) {
+                return $b['votes'] - $a['votes'];
+            });
+        }
 
         if (!empty($answers_display)) {
-            echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
-            echo '<table contenteditable class="widefat striped">';
-            echo '<thead>';
-            echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
-            echo '<th>' . __('Votes', 'wpu_polls') . '</th>';
-            echo '<th>' . __('Percent', 'wpu_polls') . '</th>';
-            echo '</thead>';
-            echo '<tbody>';
-            foreach ($answers_display as $answer) {
-                echo '<tr>';
-                echo '<td>' . $answer['answer'] . '</td>';
-                echo '<td>' . $answer['votes_str'] . '</td>';
-                echo '<td>' . $answer['percent'] . '</td>';
-                echo '</tr>';
-            }
-            echo '</tbody>';
+            if ($requiredetails) {
 
-            echo '</table>';
+                global $wpdb;
+                $q = "SELECT * FROM " . $this->baseadmindatas->tablename . " WHERE post_id=%s";
+                $short_results = $wpdb->get_results($wpdb->prepare($q, $post->ID), ARRAY_A);
+                echo '<h3>' . __('Votes', 'wpu_polls') . '</h3>';
+                echo '<table contenteditable class="widefat striped" id="wpu-polls-table-votes">';
+                echo '<thead>';
+                echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
+                echo '<th>' . __('Name', 'wpu_polls') . '</th>';
+                echo '<th>' . __('Email', 'wpu_polls') . '</th>';
+                echo '</thead>';
+                foreach ($answers_display as $answer) {
+                    $html_answer = '';
+                    foreach ($short_results as $result) {
+                        if ($result['answer_id'] != $answer['uniqid']) {
+                            continue;
+                        }
+                        $html_answer .= '<tr>';
+                        $html_answer .= '<td>' . $answer['answer'] . '</td>';
+                        $html_answer .= '<td>' . $result['user_name'] . '</td>';
+                        $html_answer .= '<td>' . $result['user_email'] . '</td>';
+                        $html_answer .= '</tr>';
+                    }
+                    if ($html_answer) {
+                        echo '<tbody>' . $html_answer . '</tbody>';
+                    }
+                }
+                echo '</table>';
+
+            } else {
+                echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
+                echo '<table contenteditable class="widefat striped">';
+                echo '<thead>';
+                echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
+                echo '<th>' . __('Votes', 'wpu_polls') . '</th>';
+                echo '<th>' . __('Percent', 'wpu_polls') . '</th>';
+                echo '</thead>';
+                echo '<tbody>';
+                foreach ($answers_display as $answer) {
+                    echo '<tr>';
+                    echo '<td>' . $answer['answer'] . '</td>';
+                    echo '<td>' . $answer['votes_str'] . '</td>';
+                    echo '<td>' . $answer['percent'] . '</td>';
+                    echo '</tr>';
+                }
+                echo '</tbody>';
+                echo '</table>';
+            }
+
         }
 
         /* Hidden fields */
@@ -492,13 +529,13 @@ class WPUPolls {
         update_post_meta($post_id, 'wpu_polls__answers', $answers);
 
         /* Save question */
-        if (isset($_POST['wpu_polls_question']) && ctype_digit($_POST['wpu_polls_question'])) {
+        if (isset($_POST['wpu_polls_question'])) {
             update_post_meta($post_id, 'wpu_polls__question', esc_html($_POST['wpu_polls_question']));
         }
         if (isset($_POST['wpu_polls_nbanswers']) && ctype_digit($_POST['wpu_polls_nbanswers'])) {
             update_post_meta($post_id, 'wpu_polls__nbanswers', esc_html($_POST['wpu_polls_nbanswers']));
         }
-        if (isset($_POST['wpu_polls_nbvotesmax'])) {
+        if (isset($_POST['wpu_polls_nbvotesmax']) && ctype_digit($_POST['wpu_polls_nbvotesmax'])) {
             update_post_meta($post_id, 'wpu_polls__nbvotesmax', esc_html($_POST['wpu_polls_nbvotesmax']));
         }
         update_post_meta($post_id, 'wpu_polls__requiredetails', isset($_POST['wpu_polls_requiredetails']) ? '1' : '0');
