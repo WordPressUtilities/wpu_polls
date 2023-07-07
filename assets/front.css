@@ -28,6 +28,7 @@
     pointer-events: none;
 }
 
+.wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-success-message,
 .wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-success,
 .wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-results {
     display: none;
