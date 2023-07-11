@@ -101,14 +101,25 @@ document.addEventListener('DOMContentLoaded', function() {
         jQuery.post(
             wpu_polls_settings.ajaxurl, _data,
             function(response) {
+                /* Failure : clean up everything */
+                if (response.hasOwnProperty('success') && !response.success) {
+                    update_all_polls();
+                    $button.prop('disabled', false);
+                    $main.find('input:checked').prop('checked', false);
+                    $main.removeClass('is-loading');
+                    return false;
+                }
+
+                /* Update status */
                 check_wrapper_vote($main, _poll_id);
-                $main.removeClass('is-loading');
                 wpu_poll_build_results($main, response);
+                $main.removeClass('is-loading');
+
+                /* Store vote status */
+                localStorage.setItem('wpu_polls_' + _poll_id, '1');
             }
         );
 
-        /* Store vote status */
-        localStorage.setItem('wpu_polls_' + _poll_id, '1');
     });
 
     function wpu_poll_build_results($wrapper, response) {
