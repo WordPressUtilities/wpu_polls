@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.11.2
+Version: 0.11.3
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.11.2';
+    private $plugin_version = '0.11.3';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -64,6 +64,10 @@ class WPUPolls {
             'table_name' => 'wpu_polls',
             'table_fields' => array(
                 'post_id' => array(
+                    'public_name' => 'Post ID',
+                    'type' => 'number'
+                ),
+                'user_id' => array(
                     'public_name' => 'Post ID',
                     'type' => 'number'
                 ),
@@ -329,6 +333,7 @@ class WPUPolls {
                 echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
                 echo '<th>' . __('Name', 'wpu_polls') . '</th>';
                 echo '<th>' . __('Email', 'wpu_polls') . '</th>';
+                echo '<th>' . __('User', 'wpu_polls') . '</th>';
                 echo '</thead>';
                 foreach ($answers_display as $answer) {
                     $html_answer = '';
@@ -340,6 +345,11 @@ class WPUPolls {
                         $html_answer .= '<td>' . $answer['answer'] . '</td>';
                         $html_answer .= '<td>' . $result['user_name'] . '</td>';
                         $html_answer .= '<td>' . $result['user_email'] . '</td>';
+                        $user_id = '';
+                        if (is_numeric($result['user_id']) && $result['user_id']) {
+                            $user_id = sprintf(__('#%s', 'wpu_polls'), $result['user_id']);
+                        }
+                        $html_answer .= '<td>' . $user_id . '</td>';
                         $html_answer .= '</tr>';
                     }
                     if ($html_answer) {
@@ -577,12 +587,15 @@ class WPUPolls {
 
         /* Required */
         $requiredetails = get_post_meta($poll_id, 'wpu_polls__requiredetails', 1);
+        $post['user_id'] = 0;
         if ($requiredetails == '1') {
             /* If user is logged-in : force default values */
             if (is_user_logged_in()) {
-                $user = get_userdata(get_current_user_id());
+                $user_id = get_current_user_id();
+                $user = get_userdata($user_id);
                 $post['user_name'] = $user->display_name;
                 $post['user_email'] = $user->user_email;
+                $post['user_id'] = $user_id;
             }
             if (!isset($post['user_name']) || empty($post['user_name'])) {
                 return false;
@@ -617,6 +630,7 @@ class WPUPolls {
             );
             if ($requiredetails == '1') {
                 $answer_data['user_email'] = $post['user_email'];
+                $answer_data['user_id'] = $post['user_id'];
                 $answer_data['user_name'] = $post['user_name'];
             }
             $this->baseadmindatas->create_line($answer_data);
@@ -806,7 +820,7 @@ class WPUPolls {
         $html_main .= '<div class="answer__inner">';
         $html_main .= '<span class="part-answer"><input id="' . esc_attr($answer_id) . '" type="' . $type . '" name="answers" value="' . esc_attr($answer['uniqid']) . '" /><label for="' . $answer_id . '">' . $answer['answer'] . '</label></span>';
         if ($nbvotesmax < 99) {
-            $html_main .= '<span>(' . __('Available: ', 'wpu_polls') . '<span class="nbvotesmax_value">' . $nbvotesmax . '</span>)</span>';
+            $html_main .= '<span>(' . __('Available: ', 'wpu_polls') . '<span class="nbvotesmax_value">0</span>)</span>';
         }
         $html_main .= '</div>';
         return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);

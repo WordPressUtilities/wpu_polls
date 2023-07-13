@@ -110,13 +110,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     return false;
                 }
 
+                /* Store vote status */
+                localStorage.setItem('wpu_polls_' + _poll_id, '1');
+
                 /* Update status */
                 check_wrapper_vote($main, _poll_id);
                 wpu_poll_build_results($main, response);
                 $main.removeClass('is-loading');
 
-                /* Store vote status */
-                localStorage.setItem('wpu_polls_' + _poll_id, '1');
             }
         );
 
