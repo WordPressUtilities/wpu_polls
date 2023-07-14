@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.11.3
+Version: 0.12.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.11.3';
+    private $plugin_version = '0.12.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -39,6 +39,7 @@ class WPUPolls {
             add_meta_box('wpu-polls-box-id', 'Poll box', array(&$this, 'edit_page_poll'), 'polls');
         });
         add_action('save_post', array(&$this, 'save_poll'));
+        add_action('current_screen', array(&$this, 'before_admin_edit'));
 
         /* Shortcode */
         add_shortcode('wpu_polls', array(&$this, 'shortcode'));
@@ -219,6 +220,24 @@ class WPUPolls {
       Edit & Save post
     ---------------------------------------------------------- */
 
+    /* Before view
+    -------------------------- */
+
+    function before_admin_edit() {
+        $screen = get_current_screen();
+        if (!$screen) {
+            return;
+        }
+        if ($screen->base != 'post' || $screen->post_type != 'polls') {
+            return;
+        }
+        if (isset($_GET['wpu_polls_export_csv']) && isset($_GET['post']) && is_numeric($_GET['post'])) {
+            $votes = $this->get_votes_for_poll($_GET['post']);
+            $short_results = $this->get_results_for_poll($_GET['post']);
+            $this->baseadmindatas->export_array_to_csv($short_results, 'polls-' . $_GET['post']);
+        }
+    }
+
     /* Edit poll
     -------------------------- */
 
@@ -324,11 +343,9 @@ class WPUPolls {
         if (!empty($answers_display)) {
             if ($requiredetails) {
 
-                global $wpdb;
-                $q = "SELECT * FROM " . $this->baseadmindatas->tablename . " WHERE post_id=%s";
-                $short_results = $wpdb->get_results($wpdb->prepare($q, $post->ID), ARRAY_A);
+                $short_results = $this->get_results_for_poll($post->ID);
                 echo '<h3>' . __('Votes', 'wpu_polls') . '</h3>';
-                echo '<table contenteditable class="widefat striped" id="wpu-polls-table-votes">';
+                echo '<table class="widefat striped" id="wpu-polls-table-votes">';
                 echo '<thead>';
                 echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
                 echo '<th>' . __('Name', 'wpu_polls') . '</th>';
@@ -357,6 +374,8 @@ class WPUPolls {
                     }
                 }
                 echo '</table>';
+                $export_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_export_csv=1');
+                echo '<hr /><div><a href="' . $export_url . '">' . __('Export results', 'wpu_polls') . '</a></div>';
 
             } else {
                 echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
@@ -636,6 +655,27 @@ class WPUPolls {
             $this->baseadmindatas->create_line($answer_data);
         }
         return true;
+    }
+
+    function get_results_for_poll($poll_id) {
+        global $wpdb;
+        $q = "SELECT * FROM " . $this->baseadmindatas->tablename . " WHERE post_id=%s";
+        $prepared_query = $wpdb->prepare($q, $poll_id);
+        $short_results = $wpdb->get_results($prepared_query, ARRAY_A);
+        $answers = $this->get_post_answers($poll_id);
+
+        $data = array();
+        foreach ($answers as $answer) {
+            foreach ($short_results as $result) {
+                if ($answer['uniqid'] != $result['answer_id']) {
+                    continue;
+                }
+                $data_item = $result;
+                $data_item['answer_name'] = $answer['answer'];
+                $data[] = $data_item;
+            }
+        }
+        return $data;
     }
 
     /* Get votes */
