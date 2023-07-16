@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.12.0
+Version: 0.12.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.12.0';
+    private $plugin_version = '0.12.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -620,6 +620,14 @@ class WPUPolls {
                 return false;
             }
             if (!isset($post['user_email']) || empty($post['user_email']) || !is_email($post['user_email'])) {
+                return false;
+            }
+        }
+
+        if (isset($post['user_email'])) {
+            global $wpdb;
+            $has_voted = $wpdb->get_row($wpdb->prepare("SELECT user_email FROM " . $this->baseadmindatas->tablename . " WHERE user_email=%s", $post['user_email']));
+            if (is_object($has_voted) && isset($has_voted->user_email)) {
                 return false;
             }
         }
