@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.12.1
+Version: 0.13.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.12.1';
+    private $plugin_version = '0.13.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -585,7 +585,7 @@ class WPUPolls {
 
     private function add_votes($poll_id, $answers_ids, $post = array()) {
         if (!is_numeric($poll_id) || !is_array($answers_ids)) {
-            return false;
+            wp_send_json_error(array('stop_form' => true, 'error_message' => __('Invalid poll', 'wpu_polls')));
         }
 
         $answers_ids = array_unique($answers_ids);
@@ -595,7 +595,7 @@ class WPUPolls {
         /* If more than a response : check if poll is multi answers */
         $nbanswers = get_post_meta($poll_id, 'wpu_polls__nbanswers', 1);
         if (count($answers_ids) > $nbanswers || count($answers) < count($answers_ids)) {
-            return false;
+            wp_send_json_error(array('stop_form' => true, 'error_message' => __('Too much answers', 'wpu_polls')));
         }
 
         /* Get number of votes */
@@ -617,10 +617,10 @@ class WPUPolls {
                 $post['user_id'] = $user_id;
             }
             if (!isset($post['user_name']) || empty($post['user_name'])) {
-                return false;
+                wp_send_json_error(array('stop_form' => true, 'error_message' => __('Form is invalid', 'wpu_polls')));
             }
             if (!isset($post['user_email']) || empty($post['user_email']) || !is_email($post['user_email'])) {
-                return false;
+                wp_send_json_error(array('stop_form' => true, 'error_message' => __('Form is invalid', 'wpu_polls')));
             }
         }
 
@@ -628,7 +628,7 @@ class WPUPolls {
             global $wpdb;
             $has_voted = $wpdb->get_row($wpdb->prepare("SELECT user_email FROM " . $this->baseadmindatas->tablename . " WHERE user_email=%s", $post['user_email']));
             if (is_object($has_voted) && isset($has_voted->user_email)) {
-                return false;
+                wp_send_json_error(array('stop_form' => true, 'error_message' => __('You have already sent a reply', 'wpu_polls')));
             }
         }
 
@@ -641,11 +641,11 @@ class WPUPolls {
         foreach ($answers_ids as $answer_id) {
             /* Answer does not exists */
             if (!in_array($answer_id, $accepted_answers)) {
-                return false;
+                wp_send_json_error(array('stop_form' => true, 'error_message' => __('Invalid answer', 'wpu_polls')));
             }
 
             if (isset($votes['results'], $votes['results'][$answer_id]) && $votes['results'][$answer_id] >= $nbvotesmax) {
-                return false;
+                wp_send_json_error(array('stop_form' => true, 'error_message' => __('Max number of answers has been reached', 'wpu_polls')));
             }
         }
 
@@ -851,6 +851,9 @@ class WPUPolls {
             $html .= '</ul>';
             $html .= '</div>';
         }
+
+        /* Message */
+        $html .= '<div class="wpu-poll-main__message"></div>';
 
         /* Wrapper end */
         $html .= '</div>';

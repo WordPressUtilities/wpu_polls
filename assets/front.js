@@ -104,8 +104,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 /* Failure : clean up everything */
                 if (response.hasOwnProperty('success') && !response.success) {
                     update_all_polls();
-                    $button.prop('disabled', false);
-                    $main.find('input:checked').prop('checked', false);
+                    if (response.data.hasOwnProperty('stop_form') && response.data.hasOwnProperty('stop_form')) {
+                        var $message = $main.find('.wpu-poll-main__message');
+                        $main.attr('data-prevent-form', '1');
+                        $message.html(response.data.error_message);
+                    }
+                    else {
+                        $button.prop('disabled', false);
+                        $main.find('input:checked').prop('checked', false);
+                    }
                     $main.removeClass('is-loading');
                     return false;
                 }
