@@ -113,6 +113,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         $button.prop('disabled', false);
                         $main.find('input:checked').prop('checked', false);
                     }
+
+                    /* Mark as voted */
+                    if (response.data.hasOwnProperty('mark_as_voted') && response.data.hasOwnProperty('mark_as_voted')) {
+                        localStorage.setItem('wpu_polls_' + _poll_id, '1');
+                    }
+
                     $main.removeClass('is-loading');
                     return false;
                 }
