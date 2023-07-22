@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.13.2
+Version: 0.13.3
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.13.2';
+    private $plugin_version = '0.13.3';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -626,9 +626,19 @@ class WPUPolls {
 
         if (isset($post['user_email'])) {
             global $wpdb;
-            $has_voted = $wpdb->get_row($wpdb->prepare("SELECT user_email FROM " . $this->baseadmindatas->tablename . " WHERE user_email=%s", $post['user_email']));
+
+            /* Check email */
+            $has_voted = $wpdb->get_row($wpdb->prepare("SELECT user_email FROM " . $this->baseadmindatas->tablename . " WHERE user_email=%s AND post_id=%d", $post['user_email'], $poll_id));
             if (is_object($has_voted) && isset($has_voted->user_email)) {
                 wp_send_json_error(array('stop_form' => true, 'mark_as_voted' => true, 'error_message' => __('You have already sent a reply', 'wpu_polls')));
+            }
+
+            /* Check user login */
+            if (is_user_logged_in()) {
+                $has_voted = $wpdb->get_row($wpdb->prepare("SELECT user_id FROM " . $this->baseadmindatas->tablename . " WHERE user_id=%s AND post_id=%d", get_current_user_id(), $poll_id));
+                if (is_object($has_voted) && isset($has_voted->user_id)) {
+                    wp_send_json_error(array('stop_form' => true, 'mark_as_voted' => true, 'error_message' => __('You have already sent a reply', 'wpu_polls')));
+                }
             }
         }
 
