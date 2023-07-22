@@ -32,6 +32,7 @@
 .wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-success-message,
 .wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-success,
 .wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-results,
+.wpu-poll-main__wrapper[data-has-voted="1"] .wpu-poll-main,
 .wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-success-message,
 .wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-success,
 .wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-results {

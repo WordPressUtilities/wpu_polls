@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.13.3
+Version: 0.13.4
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -14,7 +14,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.13.3';
+    private $plugin_version = '0.13.4';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -816,8 +816,18 @@ class WPUPolls {
             $html_results .= '</li>';
         }
 
+        $has_voted = 0;
+        if (is_user_logged_in() && $requiredetails) {
+            global $wpdb;
+            $usr = get_user_by('ID', get_current_user_id());
+            $has_voted_test = $wpdb->get_row($wpdb->prepare("SELECT user_email FROM " . $this->baseadmindatas->tablename . " WHERE (user_email=%s OR user_id=%d) AND post_id=%d", $usr->user_email, get_current_user_id(), $poll_id));
+            if (is_object($has_voted_test) && $has_voted_test->user_email) {
+                $has_voted = 1;
+            }
+        }
+
         /* Wrapper start */
-        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-required-details="' . ($requiredetails ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="0" data-poll-id="' . $poll_id . '">';
+        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-required-details="' . ($requiredetails ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="' . $has_voted . '" data-poll-id="' . $poll_id . '">';
 
         /* Questions */
         $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';
