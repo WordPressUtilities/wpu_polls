@@ -4,17 +4,23 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.13.4
+Version: 0.13.5
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
-Domain Path: /lang/
+Domain Path: /lang
+Requires at least: 6.2
+Requires PHP: 8.0
 License: MIT License
 License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.13.4';
+    public $plugin_description;
+    public $baseadmindatas;
+    public $settings_details;
+    public $settings;
+    private $plugin_version = '0.13.5';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -54,7 +60,10 @@ class WPUPolls {
 
     public function plugins_loaded() {
         # TRANSLATION
-        load_plugin_textdomain('wpu_polls', false, dirname(plugin_basename(__FILE__)) . '/lang/');
+        $lang_dir = dirname(plugin_basename(__FILE__)) . '/lang/';
+        if (!load_plugin_textdomain('wpu_polls', false, $lang_dir)) {
+            load_muplugin_textdomain('wpu_polls', $lang_dir);
+        }
         $this->plugin_description = __('WPU Polls handle simple polls', 'wpu_polls');
         # CUSTOM TABLE
         include dirname(__FILE__) . '/inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php';
