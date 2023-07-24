@@ -1,0 +1,19 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "no-prototype-builtins": 0
+    },
+    "globals": {
+        "wp": true,
+        "wpu_polls_settings": true,
+        "wpu_polls_settings_back": true,
+        "jQuery": true
+    }
+}

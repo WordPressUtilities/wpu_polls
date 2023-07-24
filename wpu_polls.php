@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.13.5
+Version: 0.13.6
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -20,7 +20,7 @@ class WPUPolls {
     public $baseadmindatas;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.13.5';
+    private $plugin_version = '0.13.6';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
