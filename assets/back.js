@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    /* Delete vote */
+    jQuery('.delete-vote-button').on('click', function(e) {
+        e.preventDefault();
+        var $btn = jQuery(this);
+        if (confirm(wpu_polls_settings_back.confirm_vote_deletion)) {
+            window.location.href = $btn.attr('data-delete-button-url');
+        }
+    });
+
     /* Hide metabox layout */
     jQuery('#wpu-polls-box-id').each(function() {
         jQuery(this).removeClass('postbox');
@@ -118,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 _nb_images++;
             }
         });
-        if(_nb_images > 0 && _nb_images != _answers.length){
+        if (_nb_images > 0 && _nb_images != _answers.length) {
             e.preventDefault();
             alert(wpu_polls_settings_back.error_need_all_images);
         }
@@ -129,12 +138,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 _nb_text++;
             }
         });
-        if(_nb_text > 0 && _nb_text != _answers.length){
+        if (_nb_text > 0 && _nb_text != _answers.length) {
             e.preventDefault();
             alert(wpu_polls_settings_back.error_need_all_text);
         }
         /* Content */
-        if(_nb_text == 0 && _nb_images == 0){
+        if (_nb_text == 0 && _nb_images == 0) {
             e.preventDefault();
             alert(wpu_polls_settings_back.error_need_content);
         }

@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.13.6
+Version: 0.14.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -20,7 +20,7 @@ class WPUPolls {
     public $baseadmindatas;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.13.6';
+    private $plugin_version = '0.14.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -121,12 +121,18 @@ class WPUPolls {
         );
         include dirname(__FILE__) . '/inc/WPUBaseSettings/WPUBaseSettings.php';
         $this->settings_obj = new \wpu_polls\WPUBaseSettings($this->settings_details, $this->settings);
+
+        if (is_admin()) {
+            include dirname(__FILE__) . '/inc/WPUBaseMessages/WPUBaseMessages.php';
+            $this->messages = new \wpu_polls\WPUBaseMessages($this->plugin_settings['id']);
+        }
     }
 
     public function admin_enqueue_scripts() {
         /* Back Script */
         wp_register_script('wpu_polls_back_script', plugins_url('assets/back.js', __FILE__), array('jquery', 'jquery-ui-sortable'), $this->plugin_version, true);
         wp_localize_script('wpu_polls_back_script', 'wpu_polls_settings_back', array(
+            'confirm_vote_deletion' => __('Do you really want to delete this vote ?', 'wpu_polls'),
             'error_need_content' => __('You can’t have only empty choices', 'wpu_polls'),
             'error_need_all_images' => __('Images should be on every choice, or none of them.', 'wpu_polls'),
             'error_need_all_text' => __('Text should be on every choice, or none of them.', 'wpu_polls'),
@@ -245,6 +251,19 @@ class WPUPolls {
             $short_results = $this->get_results_for_poll($_GET['post']);
             $this->baseadmindatas->export_array_to_csv($short_results, 'polls-' . $_GET['post']);
         }
+        if (isset($_GET['wpu_polls_delete_vote']) && isset($_GET['post']) && is_numeric($_GET['post']) && is_numeric($_GET['wpu_polls_delete_vote'])) {
+            global $wpdb;
+            $wpdb->delete($this->baseadmindatas->tablename,
+                array(
+                    'post_id' => $_GET['post'],
+                    'id' => $_GET['wpu_polls_delete_vote']
+                )
+            );
+            $this->get_votes_for_poll($_GET['post'], true);
+            $this->messages->set_message('wpu_polls_delete_vote_success', __('The vote has been successfully deleted.', 'wpu_polls'), 'updated');
+            wp_redirect(admin_url('post.php?post=' . $_GET['post'] . '&action=edit'));
+            die;
+        }
     }
 
     /* Edit poll
@@ -360,6 +379,7 @@ class WPUPolls {
                 echo '<th>' . __('Name', 'wpu_polls') . '</th>';
                 echo '<th>' . __('Email', 'wpu_polls') . '</th>';
                 echo '<th>' . __('User', 'wpu_polls') . '</th>';
+                echo '<th></th>';
                 echo '</thead>';
                 foreach ($answers_display as $answer) {
                     $html_answer = '';
@@ -367,6 +387,7 @@ class WPUPolls {
                         if ($result['answer_id'] != $answer['uniqid']) {
                             continue;
                         }
+                        $delete_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_delete_vote=' . $result['id']);
                         $html_answer .= '<tr>';
                         $html_answer .= '<td>' . $answer['answer'] . '</td>';
                         $html_answer .= '<td>' . $result['user_name'] . '</td>';
@@ -376,6 +397,7 @@ class WPUPolls {
                             $user_id = sprintf(__('#%s', 'wpu_polls'), $result['user_id']);
                         }
                         $html_answer .= '<td>' . $user_id . '</td>';
+                        $html_answer .= '<td><button class="delete-vote-button" type="button" data-delete-button-url="' . esc_url($delete_url) . '">&times;</button></td>';
                         $html_answer .= '</tr>';
                     }
                     if ($html_answer) {
