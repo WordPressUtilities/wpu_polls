@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.14.0
+Version: 0.15.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -20,7 +20,7 @@ class WPUPolls {
     public $baseadmindatas;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.14.0';
+    private $plugin_version = '0.15.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -46,6 +46,8 @@ class WPUPolls {
         });
         add_action('save_post', array(&$this, 'save_poll'));
         add_action('current_screen', array(&$this, 'before_admin_edit'));
+        add_action('show_user_profile', array(&$this, 'edit_user_box'));
+        add_action('edit_user_profile', array(&$this, 'edit_user_box'));
 
         /* Shortcode */
         add_shortcode('wpu_polls', array(&$this, 'shortcode'));
@@ -388,14 +390,14 @@ class WPUPolls {
                             continue;
                         }
                         $delete_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_delete_vote=' . $result['id']);
+                        $user_id = '';
+                        if (is_numeric($result['user_id']) && $result['user_id']) {
+                            $user_id = '<a href="' . admin_url('user-edit.php?user_id=' . $result['user_id']) . '">' . sprintf(__('#%s', 'wpu_polls'), $result['user_id']) . '</a>';
+                        }
                         $html_answer .= '<tr>';
                         $html_answer .= '<td>' . $answer['answer'] . '</td>';
                         $html_answer .= '<td>' . $result['user_name'] . '</td>';
                         $html_answer .= '<td>' . $result['user_email'] . '</td>';
-                        $user_id = '';
-                        if (is_numeric($result['user_id']) && $result['user_id']) {
-                            $user_id = sprintf(__('#%s', 'wpu_polls'), $result['user_id']);
-                        }
                         $html_answer .= '<td>' . $user_id . '</td>';
                         $html_answer .= '<td><button class="delete-vote-button" type="button" data-delete-button-url="' . esc_url($delete_url) . '">&times;</button></td>';
                         $html_answer .= '</tr>';
@@ -540,6 +542,10 @@ class WPUPolls {
             return;
         }
         define('WPU_POLLS__SAVE_POST', 1);
+
+        if (!current_user_can('edit_post', $post_id)) {
+            return false;
+        }
 
         /* Empty or invalid post response */
         $post_keys = array(
@@ -791,6 +797,35 @@ class WPUPolls {
             wp_send_json_error();
         }
         wp_send_json($this->get_votes_for_poll($_POST['poll_id'], 1));
+    }
+
+    /* ----------------------------------------------------------
+      User
+    ---------------------------------------------------------- */
+
+    function edit_user_box($profile_user) {
+        if (!is_object($profile_user)) {
+            return;
+        }
+        global $wpdb;
+        $q = "SELECT * FROM " . $this->baseadmindatas->tablename . " WHERE user_id=%s";
+        $prepared_query = $wpdb->prepare($q, $profile_user->ID);
+        $short_results = $wpdb->get_results($prepared_query, ARRAY_A);
+
+        if (empty($short_results)) {
+            return;
+        }
+
+        echo '<div class="postbox">';
+        echo '<div class="postbox-header"><h2>' . __('Votes', 'wpu_polls') . '</h2></div>';
+        echo '<div class="inside">';
+        echo '<ul>';
+        foreach ($short_results as $res) {
+            echo '<li>#' . $res['post_id'] . ' - <a href="' . admin_url('post.php?post=' . $res['post_id'] . '&action=edit') . '">' . get_the_title($res['post_id']) . '</a></li>';
+        }
+        echo '</ul>';
+        echo '</div>';
+        echo '</div>';
     }
 
     /* ----------------------------------------------------------
