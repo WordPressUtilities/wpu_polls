@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.15.0
+Version: 0.15.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -20,7 +20,7 @@ class WPUPolls {
     public $baseadmindatas;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.15.0';
+    private $plugin_version = '0.15.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -309,15 +309,25 @@ class WPUPolls {
             'id' => 'wpu-polls-displaymessage',
             'label' => __('Display a message after vote instead of the results', 'wpu_polls')
         ));
+        echo $this->get_template_text(array(
+            'post_id' => $post->ID,
+            'meta_key' => 'wpu_polls__displaymessage__content',
+            'post_key' => 'wpu_polls_displaymessage_content',
+            'id' => 'wpu-polls-displaymessage-content',
+            'label' => __('Custom text message after vote', 'wpu_polls')
+        ));
 
         echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
 
         /* Question */
-        echo '<p>';
-        echo '<label for="wpu-polls-question">' . __('Question:', 'wpu_polls') . '</label>';
-        echo '<input type="text" name="wpu_polls_question" id="wpu-polls-question" value="' . esc_attr($question) . '" />';
-        echo '</p>';
 
+        echo $this->get_template_text(array(
+            'post_id' => $post->ID,
+            'meta_key' => 'wpu_polls__question',
+            'post_key' => 'wpu_polls_question',
+            'id' => 'wpu-polls-question',
+            'label' => __('Question :', 'wpu_polls')
+        ));
         /* Answers */
         echo '<table class="widefat striped">';
         echo '<thead>';
@@ -437,7 +447,20 @@ class WPUPolls {
         echo '<script type="text/template" id="wpu-polls-answer-template">' . $this->get_template_answer() . '</script>';
     }
 
-    /* Select template */
+    /* Checkbox template */
+
+    private function get_template_text($args = array()) {
+        $value = get_post_meta($args['post_id'], $args['meta_key'], 1);
+        $html = '';
+        $html .= '<p class="wpu-polls-field-text" id="' . $args['id'] . '-wrapper">';
+        $html .= '<label for="' . $args['id'] . '">' . $args['label'] . '</label>';
+        $html .= '<input value="' . $value . '" type="text" name="' . $args['post_key'] . '" id="' . $args['id'] . '" />';
+        $html .= '</p>';
+
+        return $html;
+    }
+
+    /* Text template */
 
     private function get_template_checkbox($args = array()) {
         $value = get_post_meta($args['post_id'], $args['meta_key'], 1);
@@ -597,6 +620,9 @@ class WPUPolls {
         /* Save question */
         if (isset($_POST['wpu_polls_question'])) {
             update_post_meta($post_id, 'wpu_polls__question', esc_html($_POST['wpu_polls_question']));
+        }
+        if (isset($_POST['wpu_polls_displaymessage_content'])) {
+            update_post_meta($post_id, 'wpu_polls__displaymessage__content', esc_html($_POST['wpu_polls_displaymessage_content']));
         }
         if (isset($_POST['wpu_polls_nbanswers']) && ctype_digit($_POST['wpu_polls_nbanswers'])) {
             update_post_meta($post_id, 'wpu_polls__nbanswers', esc_html($_POST['wpu_polls_nbanswers']));
@@ -927,11 +953,15 @@ class WPUPolls {
 
         /* Results */
         if ($displaymessage) {
-            $html .= '<div class="wpu-poll-success-message">';
-            $html .= '<p>' . apply_filters('wpu_polls__success_message', __('Thank you for your vote !', 'wpu_polls')) . '</p>';
+            $displaymessage__content = get_post_meta($poll_id, 'wpu_polls__displaymessage__content', 1);
+            if (!$displaymessage__content) {
+                $displaymessage__content = apply_filters('wpu_polls__success_message', __('Thank you for your vote !', 'wpu_polls'));
+            }
+            $html .= '<div data-nosnippet class="wpu-poll-success-message">';
+            $html .= '<p>' . $displaymessage__content . '</p>';
             $html .= '</div>';
         } else {
-            $html .= '<div class="wpu-poll-results">';
+            $html .= '<div data-nosnippet class="wpu-poll-results">';
             $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
             $html .= $html_results;
             $html .= '</ul>';

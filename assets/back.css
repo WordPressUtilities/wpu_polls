@@ -12,14 +12,18 @@
   Text
 ---------------------------------------------------------- */
 
-label[for="wpu-polls-question"] {
+.wpu-polls-field-text label {
     display: block;
     margin-bottom: 6px;
 }
 
-input[name="wpu_polls_question"],
+.wpu-polls-field-text input,
 .answer-line input.answer-text {
     width: 100%;
+}
+
+.wpu-polls-field-text[data-hidden="1"] {
+    display: none;
 }
 
 /* ----------------------------------------------------------

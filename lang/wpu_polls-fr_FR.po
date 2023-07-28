@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2023-07-27 23:40+0200\n"
+"POT-Creation-Date: 2023-07-28 20:34+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -57,15 +57,15 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:154 wpu_polls.php:346
+#: wpu_polls.php:154 wpu_polls.php:356
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:155 wpu_polls.php:348
+#: wpu_polls.php:155 wpu_polls.php:358
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:156 wpu_polls.php:351
+#: wpu_polls.php:156 wpu_polls.php:361
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
@@ -74,7 +74,7 @@ msgstr "%d votes"
 msgid "Polls"
 msgstr "Sondages"
 
-#: wpu_polls.php:168 wpu_polls.php:170 wpu_polls.php:313
+#: wpu_polls.php:168 wpu_polls.php:170 wpu_polls.php:320
 msgid "Poll"
 msgstr "Sondage"
 
@@ -165,103 +165,107 @@ msgid "Display a message after vote instead of the results"
 msgstr "Afficher un message après le vote au lieu des résultats"
 
 #: wpu_polls.php:317
-msgid "Question:"
+msgid "Custom text message after vote"
+msgstr "Message texte personnalisé après le vote"
+
+#: wpu_polls.php:329
+msgid "Question :"
 msgstr "Question :"
 
-#: wpu_polls.php:325
+#: wpu_polls.php:335
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:326 wpu_polls.php:380 wpu_polls.php:417
+#: wpu_polls.php:336 wpu_polls.php:390 wpu_polls.php:427
 msgid "Answer"
 msgstr "Réponse"
 
-#: wpu_polls.php:336
+#: wpu_polls.php:346
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:377 wpu_polls.php:418 wpu_polls.php:820
+#: wpu_polls.php:387 wpu_polls.php:428 wpu_polls.php:846
 msgid "Votes"
 msgstr "Votes"
 
-#: wpu_polls.php:381 wpu_polls.php:920
+#: wpu_polls.php:391 wpu_polls.php:946
 msgid "Name"
 msgstr "Nom"
 
-#: wpu_polls.php:382 wpu_polls.php:921
+#: wpu_polls.php:392 wpu_polls.php:947
 msgid "Email"
 msgstr "E-mail"
 
-#: wpu_polls.php:383
+#: wpu_polls.php:393
 msgid "User"
 msgstr "Utilisateur"
 
-#: wpu_polls.php:395
+#: wpu_polls.php:405
 #, php-format
 msgid "#%s"
 msgstr "#%s"
 
-#: wpu_polls.php:411
+#: wpu_polls.php:421
 msgid "Export results"
 msgstr "Exporter les résultats"
 
-#: wpu_polls.php:414
+#: wpu_polls.php:424
 msgid "Results"
 msgstr "Résultats"
 
-#: wpu_polls.php:419
+#: wpu_polls.php:429
 msgid "Percent"
 msgstr "Pourcent"
 
-#: wpu_polls.php:465
+#: wpu_polls.php:488
 msgid "Multiple"
 msgstr "Multiple"
 
-#: wpu_polls.php:482
+#: wpu_polls.php:505
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:483
+#: wpu_polls.php:506
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:487
+#: wpu_polls.php:510
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:625
+#: wpu_polls.php:651
 msgid "Invalid poll"
 msgstr "Sondage invalide"
 
-#: wpu_polls.php:635
+#: wpu_polls.php:661
 msgid "Too much answers"
 msgstr "Trop de réponses"
 
-#: wpu_polls.php:657 wpu_polls.php:660
+#: wpu_polls.php:683 wpu_polls.php:686
 msgid "Form is invalid"
 msgstr "Le formulaire n’est pas valide"
 
-#: wpu_polls.php:670 wpu_polls.php:677
+#: wpu_polls.php:696 wpu_polls.php:703
 msgid "You have already sent a reply"
 msgstr "Vous avez déjà envoyé une réponse"
 
-#: wpu_polls.php:691
+#: wpu_polls.php:717
 msgid "Invalid answer"
 msgstr "Réponse non valide"
 
-#: wpu_polls.php:695
+#: wpu_polls.php:721
 msgid "Max number of answers has been reached"
 msgstr "Le nombre maximum de réponses a été atteint"
 
-#: wpu_polls.php:925
+#: wpu_polls.php:951
 msgid "Submit"
 msgstr "Envoyer"
 
-#: wpu_polls.php:931
+#: wpu_polls.php:958
 msgid "Thank you for your vote !"
 msgstr "Merci pour votre vote !"
 
-#: wpu_polls.php:960
+#: wpu_polls.php:990
 msgid "Available: "
 msgstr "Disponible: "
 
