@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.15.1
+Version: 0.16.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -16,11 +16,13 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
+    public $messages;
     public $plugin_description;
     public $baseadmindatas;
+    public $basefields;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.15.1';
+    private $plugin_version = '0.16.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -93,6 +95,10 @@ class WPUPolls {
                 ),
                 'user_name' => array(
                     'public_name' => 'User name'
+                ),
+                'gdpr' => array(
+                    'public_name' => 'GDPR',
+                    'type' => 'number'
                 )
             )
         ));
@@ -128,6 +134,73 @@ class WPUPolls {
             include dirname(__FILE__) . '/inc/WPUBaseMessages/WPUBaseMessages.php';
             $this->messages = new \wpu_polls\WPUBaseMessages($this->plugin_settings['id']);
         }
+
+        $select_values = array();
+        for ($i = 1; $i < 99; $i++) {
+            $select_values[$i] = $i;
+        }
+        $select_values[$this->nb_max] = __('Multiple', 'wpu_polls');
+
+        include dirname(__FILE__) . '/inc/WPUBaseFields/WPUBaseFields.php';
+        $fields = array(
+            'wpu_polls__nbanswers' => array(
+                'type' => 'select',
+                'default_value' => $this->nb_max,
+                'group' => 'wpu_polls__settings',
+                'label' => __('User can choose this number of answers :', 'wpu_polls'),
+                'data' => $select_values
+            ),
+            'wpu_polls__nbvotesmax' => array(
+                'type' => 'select',
+                'default_value' => $this->nb_max,
+                'group' => 'wpu_polls__settings',
+                'label' => __('Maximum number of votes per response :', 'wpu_polls'),
+                'data' => $select_values
+            ),
+            'wpu_polls__requiredetails' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__settings',
+                'label' => __('Require user name and email to vote (use account details if loggedin)', 'wpu_polls')
+            ),
+            'wpu_polls__gdprcheckbox' => array(
+                'toggle-display' => array(
+                    'wpu_polls__requiredetails' => 'checked'
+                ),
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__settings',
+                'label' => __('Display a GDPR checkbox', 'wpu_polls')
+            ),
+            'wpu_polls__displaymessage' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__settings',
+                'label' => __('Display a message after vote instead of the results', 'wpu_polls')
+            ),
+            'wpu_polls__displaymessage__content' => array(
+                'toggle-display' => array(
+                    'wpu_polls__displaymessage' => 'checked'
+                ),
+                'group' => 'wpu_polls__settings',
+                'help' => __('Displayed only if previous checkbox is checked.', 'wpu_polls'),
+                'label' => __('Custom text message after vote', 'wpu_polls')
+            ),
+            /* Poll */
+            'wpu_polls__question' => array(
+                'group' => 'wpu_polls__poll',
+                'label' => __('Question', 'wpu_polls'),
+                'required' => true
+            )
+        );
+        $field_groups = array(
+            'wpu_polls__settings' => array(
+                'label' => __('Settings', 'wpu_polls'),
+                'post_type' => 'polls'
+            ),
+            'wpu_polls__poll' => array(
+                'label' => __('Poll', 'wpu_polls'),
+                'post_type' => 'polls'
+            )
+        );
+        $this->basefields = new \wpu_polls\WPUBaseFields($fields, $field_groups);
     }
 
     public function admin_enqueue_scripts() {
@@ -272,62 +345,11 @@ class WPUPolls {
     -------------------------- */
 
     public function edit_page_poll($post) {
-        $question = get_post_meta($post->ID, 'wpu_polls__question', 1);
 
         $answers = $this->get_post_answers($post->ID);
-
-        echo '<h3>' . __('Settings', 'wpu_polls') . '</h3>';
-
-        /* Number of choices */
-        echo $this->get_template_select(array(
-            'post_id' => $post->ID,
-            'default_value' => 1,
-            'meta_key' => 'wpu_polls__nbanswers',
-            'post_key' => 'wpu_polls_nbanswers',
-            'id' => 'wpu-polls-nbanswers',
-            'label' => __('User can choose this number of answers :', 'wpu_polls')
-        ));
-        echo $this->get_template_select(array(
-            'post_id' => $post->ID,
-            'default_value' => $this->nb_max,
-            'meta_key' => 'wpu_polls__nbvotesmax',
-            'post_key' => 'wpu_polls_nbvotesmax',
-            'id' => 'wpu-polls-nbvotesmax',
-            'label' => __('Maximum number of votes per response :', 'wpu_polls')
-        ));
-        echo $this->get_template_checkbox(array(
-            'post_id' => $post->ID,
-            'meta_key' => 'wpu_polls__requiredetails',
-            'post_key' => 'wpu_polls_requiredetails',
-            'id' => 'wpu-polls-requiredetails',
-            'label' => __('Require user name and email to vote (use account details if loggedin)', 'wpu_polls')
-        ));
-        echo $this->get_template_checkbox(array(
-            'post_id' => $post->ID,
-            'meta_key' => 'wpu_polls__displaymessage',
-            'post_key' => 'wpu_polls_displaymessage',
-            'id' => 'wpu-polls-displaymessage',
-            'label' => __('Display a message after vote instead of the results', 'wpu_polls')
-        ));
-        echo $this->get_template_text(array(
-            'post_id' => $post->ID,
-            'meta_key' => 'wpu_polls__displaymessage__content',
-            'post_key' => 'wpu_polls_displaymessage_content',
-            'id' => 'wpu-polls-displaymessage-content',
-            'label' => __('Custom text message after vote', 'wpu_polls')
-        ));
-
+        echo '<div class="wpu-poll-details-inner">';
         echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
 
-        /* Question */
-
-        echo $this->get_template_text(array(
-            'post_id' => $post->ID,
-            'meta_key' => 'wpu_polls__question',
-            'post_key' => 'wpu_polls_question',
-            'id' => 'wpu-polls-question',
-            'label' => __('Question :', 'wpu_polls')
-        ));
         /* Answers */
         echo '<table class="widefat striped">';
         echo '<thead>';
@@ -342,7 +364,7 @@ class WPUPolls {
         }
         echo '</tbody></table>';
 
-        /* Add a line */
+        /* New line */
         echo '<p style="text-align:right"><button class="button button-primary button-large" type="button" id="wpu-polls-answer-add-line">' . __('Add an answer', 'wpu_polls') . '</button></p>';
 
         $answers = $this->get_post_answers(get_the_ID());
@@ -391,6 +413,7 @@ class WPUPolls {
                 echo '<th>' . __('Name', 'wpu_polls') . '</th>';
                 echo '<th>' . __('Email', 'wpu_polls') . '</th>';
                 echo '<th>' . __('User', 'wpu_polls') . '</th>';
+                echo '<th>' . __('GDPR', 'wpu_polls') . '</th>';
                 echo '<th></th>';
                 echo '</thead>';
                 foreach ($answers_display as $answer) {
@@ -409,6 +432,7 @@ class WPUPolls {
                         $html_answer .= '<td>' . $result['user_name'] . '</td>';
                         $html_answer .= '<td>' . $result['user_email'] . '</td>';
                         $html_answer .= '<td>' . $user_id . '</td>';
+                        $html_answer .= '<td>' . ($result['gdpr'] ? '&checkmark;' : '') . '</td>';
                         $html_answer .= '<td><button class="delete-vote-button" type="button" data-delete-button-url="' . esc_url($delete_url) . '">&times;</button></td>';
                         $html_answer .= '</tr>';
                     }
@@ -444,52 +468,9 @@ class WPUPolls {
 
         /* Hidden fields */
         wp_nonce_field('wpu_polls_post_form', 'wpu_polls_post_form_nonce');
+        echo '</div>';
         echo '<script type="text/template" id="wpu-polls-answer-template">' . $this->get_template_answer() . '</script>';
-    }
 
-    /* Checkbox template */
-
-    private function get_template_text($args = array()) {
-        $value = get_post_meta($args['post_id'], $args['meta_key'], 1);
-        $html = '';
-        $html .= '<p class="wpu-polls-field-text" id="' . $args['id'] . '-wrapper">';
-        $html .= '<label for="' . $args['id'] . '">' . $args['label'] . '</label>';
-        $html .= '<input value="' . $value . '" type="text" name="' . $args['post_key'] . '" id="' . $args['id'] . '" />';
-        $html .= '</p>';
-
-        return $html;
-    }
-
-    /* Text template */
-
-    private function get_template_checkbox($args = array()) {
-        $value = get_post_meta($args['post_id'], $args['meta_key'], 1);
-        $html = '';
-        $html .= '<p>';
-        $html .= '<input value="1" ' . ($value ? 'checked' : '') . ' type="checkbox" name="' . $args['post_key'] . '" id="' . $args['id'] . '" />';
-        $html .= '<label for="' . $args['id'] . '">' . $args['label'] . '</label> ';
-        $html .= '</p>';
-
-        return $html;
-    }
-
-    private function get_template_select($args = array()) {
-        $nbanswers = get_post_meta($args['post_id'], $args['meta_key'], 1);
-        if (!$nbanswers) {
-            $nbanswers = $args['default_value'];
-        }
-        $html = '';
-        $html .= '<p>';
-        $html .= '<label for="' . $args['id'] . '">' . $args['label'] . '</label> ';
-        $html .= '<select name="' . $args['post_key'] . '" id="' . $args['id'] . '">';
-        for ($i = 1; $i < 99; $i++) {
-            $html .= '<option ' . ($nbanswers == $i ? 'selected' : '') . ' value="' . $i . '">' . $i . '</option>';
-        }
-        $html .= '<option ' . ($nbanswers >= 99 ? 'selected' : '') . ' value="' . $this->nb_max . '">' . __('Multiple', 'wpu_polls') . '</option>';
-        $html .= '</select>';
-        $html .= '</p>';
-
-        return $html;
     }
 
     /* Answer template */
@@ -616,23 +597,6 @@ class WPUPolls {
             );
         }
         update_post_meta($post_id, 'wpu_polls__answers', $answers);
-
-        /* Save question */
-        if (isset($_POST['wpu_polls_question'])) {
-            update_post_meta($post_id, 'wpu_polls__question', esc_html($_POST['wpu_polls_question']));
-        }
-        if (isset($_POST['wpu_polls_displaymessage_content'])) {
-            update_post_meta($post_id, 'wpu_polls__displaymessage__content', esc_html($_POST['wpu_polls_displaymessage_content']));
-        }
-        if (isset($_POST['wpu_polls_nbanswers']) && ctype_digit($_POST['wpu_polls_nbanswers'])) {
-            update_post_meta($post_id, 'wpu_polls__nbanswers', esc_html($_POST['wpu_polls_nbanswers']));
-        }
-        if (isset($_POST['wpu_polls_nbvotesmax']) && ctype_digit($_POST['wpu_polls_nbvotesmax'])) {
-            update_post_meta($post_id, 'wpu_polls__nbvotesmax', esc_html($_POST['wpu_polls_nbvotesmax']));
-        }
-        update_post_meta($post_id, 'wpu_polls__requiredetails', isset($_POST['wpu_polls_requiredetails']) ? '1' : '0');
-        update_post_meta($post_id, 'wpu_polls__displaymessage', isset($_POST['wpu_polls_displaymessage']) ? '1' : '0');
-
         wp_update_post(array(
             'ID' => $post_id,
             'post_content' => '[wpu_polls id="' . $post_id . '"]'
@@ -732,6 +696,7 @@ class WPUPolls {
                 $answer_data['user_email'] = $post['user_email'];
                 $answer_data['user_id'] = $post['user_id'];
                 $answer_data['user_name'] = $post['user_name'];
+                $answer_data['gdpr'] = isset($post['user_gdpr']) ? 1 : 0;
             }
             $this->baseadmindatas->create_line($answer_data);
         }
@@ -873,6 +838,7 @@ class WPUPolls {
 
         $requiredetails = get_post_meta($poll_id, 'wpu_polls__requiredetails', 1);
         $displaymessage = get_post_meta($poll_id, 'wpu_polls__displaymessage', 1);
+        $gdprcheckbox = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox', 1);
 
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
@@ -945,6 +911,13 @@ class WPUPolls {
             $html .= '<div class="wpu-polls-require-details-area">';
             $html .= '<p><label for="' . $id_prefix . '_name">' . __('Name', 'wpu_polls') . $label_extra . '</label><input required ' . $readonly . ' value="' . esc_attr($user_name) . '" id="' . $id_prefix . '_name" name="user_name" type="text" /></p>';
             $html .= '<p><label for="' . $id_prefix . '_email">' . __('Email', 'wpu_polls') . $label_extra . '</label><input required ' . $readonly . ' value="' . esc_attr($user_email) . '" id="' . $id_prefix . '_email" name="user_email" type="email" /></p>';
+            if ($gdprcheckbox) {
+                $gdpr_message = apply_filters('wpu_polls__gdprcheckbox__text', sprintf(__('I agree to be contacted by phone or email by %s or its partners.', 'wpu_polls'), get_option('blogname')));
+                $html .= '<p>';
+                $html .= '<input value="1" id="' . $id_prefix . '_gdpr" name="user_gdpr" type="checkbox" />';
+                $html .= '<label for="' . $id_prefix . '_gdpr">' . $gdpr_message . '</label>';
+                $html .= '</p>';
+            }
             $html .= '</div>';
         }
 

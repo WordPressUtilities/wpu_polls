@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             $main = $wrapper.closest('.wpu-poll-main__wrapper'),
             $user_name = $main.find('[name="user_name"]'),
             $user_email = $main.find('[name="user_email"]'),
+            $user_gdpr = $main.find('[name="user_gdpr"]'),
             $answers = $main.find('.wpu-poll-main__answers');
 
         /* Extract poll id */
@@ -95,6 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if ($user_email) {
             _data.user_email = $user_email.val();
+        }
+        if ($user_gdpr) {
+            _data.user_gdpr = $user_gdpr.val();
         }
 
         /* Send action */

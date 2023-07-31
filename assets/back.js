@@ -112,18 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return $items;
     }
 
-    /* Custom check */
-    (function() {
-        var $area = document.getElementById('wpu-polls-displaymessage-content-wrapper');
-        var $check = document.getElementById('wpu-polls-displaymessage');
-        var check_change = function() {
-            $area.setAttribute('data-hidden', $check.checked ? '0' : '1');
-        };
-        check_change();
-        $check.addEventListener('change', check_change, 1);
-
-    }());
-
     /* Avoid some errors on submit */
     $form.on('submit', function(e) {
         var _answers = $form.find('.wpu-polls-answers .answer-line');
