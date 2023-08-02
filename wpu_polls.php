@@ -4,7 +4,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.16.0
+Version: 0.16.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -22,7 +22,7 @@ class WPUPolls {
     public $basefields;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.16.0';
+    private $plugin_version = '0.16.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -125,6 +125,14 @@ class WPUPolls {
                     __('No', 'wpu_polls'),
                     __('Yes', 'wpu_polls')
                 )
+            ),
+            'gdpr_message' => array(
+                'label' => __('Default GDPR Message', 'wpu_polls'),
+                'type' => 'textarea'
+            ),
+            'success_message' => array(
+                'label' => __('Default Success Message', 'wpu_polls'),
+                'type' => 'textarea'
             )
         );
         include dirname(__FILE__) . '/inc/WPUBaseSettings/WPUBaseSettings.php';
@@ -170,6 +178,13 @@ class WPUPolls {
                 'group' => 'wpu_polls__settings',
                 'label' => __('Display a GDPR checkbox', 'wpu_polls')
             ),
+            'wpu_polls__gdprcheckbox__text' => array(
+                'toggle-display' => array(
+                    'wpu_polls__gdprcheckbox' => 'checked'
+                ),
+                'group' => 'wpu_polls__settings',
+                'label' => __('Custom GDPR message', 'wpu_polls')
+            ),
             'wpu_polls__displaymessage' => array(
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__settings',
@@ -180,7 +195,6 @@ class WPUPolls {
                     'wpu_polls__displaymessage' => 'checked'
                 ),
                 'group' => 'wpu_polls__settings',
-                'help' => __('Displayed only if previous checkbox is checked.', 'wpu_polls'),
                 'label' => __('Custom text message after vote', 'wpu_polls')
             ),
             /* Poll */
@@ -850,6 +864,8 @@ class WPUPolls {
             return '';
         }
 
+        $settings = $this->settings_obj->get_settings();
+
         $results = $this->get_votes_for_poll($poll_id, 1);
 
         $id_prefix = 'answer__' . $poll_id . '__';
@@ -912,7 +928,15 @@ class WPUPolls {
             $html .= '<p><label for="' . $id_prefix . '_name">' . __('Name', 'wpu_polls') . $label_extra . '</label><input required ' . $readonly . ' value="' . esc_attr($user_name) . '" id="' . $id_prefix . '_name" name="user_name" type="text" /></p>';
             $html .= '<p><label for="' . $id_prefix . '_email">' . __('Email', 'wpu_polls') . $label_extra . '</label><input required ' . $readonly . ' value="' . esc_attr($user_email) . '" id="' . $id_prefix . '_email" name="user_email" type="email" /></p>';
             if ($gdprcheckbox) {
-                $gdpr_message = apply_filters('wpu_polls__gdprcheckbox__text', sprintf(__('I agree to be contacted by phone or email by %s or its partners.', 'wpu_polls'), get_option('blogname')));
+                $gdpr_message = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox__text', 1);
+                if (!$gdpr_message) {
+                    $gdpr_message = sprintf(__('I agree to be contacted by phone or email by %s or its partners.', 'wpu_polls'), get_option('blogname'));
+                    if (isset($settings['gdpr_message']) && $settings['gdpr_message']) {
+                        $gdpr_message = $settings['gdpr_message'];
+                    }
+                }
+                $gdpr_message = nl2br(trim(strip_tags($gdpr_message)));
+                $gdpr_message = apply_filters('wpu_polls__gdprcheckbox__text', $gdpr_message, $poll_id);
                 $html .= '<p>';
                 $html .= '<input value="1" id="' . $id_prefix . '_gdpr" name="user_gdpr" type="checkbox" />';
                 $html .= '<label for="' . $id_prefix . '_gdpr">' . $gdpr_message . '</label>';
@@ -929,7 +953,12 @@ class WPUPolls {
             $displaymessage__content = get_post_meta($poll_id, 'wpu_polls__displaymessage__content', 1);
             if (!$displaymessage__content) {
                 $displaymessage__content = apply_filters('wpu_polls__success_message', __('Thank you for your vote !', 'wpu_polls'));
+                if (isset($settings['success_message']) && $settings['success_message']) {
+                    $displaymessage__content = $settings['success_message'];
+                }
             }
+            $displaymessage__content = nl2br(trim(strip_tags($displaymessage__content)));
+            $displaymessage__content = apply_filters('wpu_polls__displaymessage__content', $displaymessage__content, $poll_id);
             $html .= '<div data-nosnippet class="wpu-poll-success-message">';
             $html .= '<p>' . $displaymessage__content . '</p>';
             $html .= '</div>';
