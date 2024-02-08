@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die;
 if (!defined('WP_UNINSTALL_PLUGIN')) {
     die;
 }
@@ -6,6 +7,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 /* Delete options */
 $options = array(
     'wpu_polls_options',
+    'wpu_polls_ip_salt',
     'wpu_polls_wpu_polls_version'
 );
 foreach ($options as $opt) {

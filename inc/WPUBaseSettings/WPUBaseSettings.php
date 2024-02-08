@@ -4,13 +4,15 @@ namespace wpu_polls;
 /*
 Class Name: WPU Base Settings
 Description: A class to handle native settings in WordPress admin
-Version: 0.17.5
+Version: 0.18.1
 Class URI: https://github.com/WordPressUtilities/wpubaseplugin
 Author: Darklg
 Author URI: https://darklg.me/
 License: MIT License
 License URI: https://opensource.org/licenses/MIT
 */
+
+defined('ABSPATH') || die;
 
 class WPUBaseSettings {
 
@@ -75,13 +77,7 @@ class WPUBaseSettings {
     }
 
     public function get_settings() {
-        $opt = get_option($this->settings_details['option_id']);
-        if (!is_array($opt)) {
-            /* Set default values */
-            $opt = $this->get_setting_values();
-            update_option($this->settings_details['option_id'], $opt);
-        }
-        return $opt;
+        return $this->get_setting_values();
     }
 
     public function get_setting($id, $lang = false) {
@@ -223,6 +219,7 @@ class WPUBaseSettings {
                 'id' => $id,
                 'lang_id' => $lang_id,
                 'label_for' => $id,
+                'translated_from' => isset($this->settings[$id]['translated_from']) ? $this->settings[$id]['translated_from'] : false,
                 'required' => $this->settings[$id]['required'],
                 'post_type' => $this->settings[$id]['post_type'],
                 'datas' => $this->settings[$id]['datas'],
@@ -328,6 +325,9 @@ class WPUBaseSettings {
         }
         $id .= $attr;
         $value = isset($options[$args['id']]) ? $options[$args['id']] : $args['default_value'];
+        if(!isset($options[$args['id']]) && isset($args['translated_from']) && $args['translated_from'] && isset($options[$args['translated_from']]) && $options[$args['translated_from']]){
+            $value = $options[$args['translated_from']];
+        }
 
         switch ($args['type']) {
         case 'checkbox':
@@ -365,12 +365,14 @@ class WPUBaseSettings {
             break;
         case 'post':
         case 'page':
-            wp_dropdown_pages(array(
+            $code_dropdown = wp_dropdown_pages(array(
+                'echo' => false,
                 'name' => $name_val,
                 'id' => $args['id'],
                 'selected' => $value,
                 'post_type' => isset($args['post_type']) ? $args['post_type'] : $args['type']
             ));
+            echo str_replace('<select ', '<select ' . $attr, $code_dropdown);
             break;
         case 'select':
             echo '<select ' . $name . ' ' . $id . '>';

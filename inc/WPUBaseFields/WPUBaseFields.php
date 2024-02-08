@@ -4,7 +4,7 @@ namespace wpu_polls;
 /*
 Class Name: WPU Base Fields
 Description: A class to handle fields in WordPress
-Version: 0.16.0
+Version: 0.16.2
 Class URI: https://github.com/WordPressUtilities/wpubaseplugin
 Author: Darklg
 Author URI: https://darklg.me/
@@ -12,9 +12,11 @@ License: MIT License
 License URI: https://opensource.org/licenses/MIT
 */
 
+defined('ABSPATH') || die;
+
 class WPUBaseFields {
     private $script_id;
-    private $version = '0.16.0';
+    private $version = '0.16.1';
     private $fields = array();
     private $field_groups = array();
     private $supported_types = array(

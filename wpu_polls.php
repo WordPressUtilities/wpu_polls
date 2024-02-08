@@ -1,10 +1,11 @@
 <?php
+defined('ABSPATH') || die;
 /*
 Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.16.1
+Version: 0.17.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -22,7 +23,7 @@ class WPUPolls {
     public $basefields;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.16.1';
+    private $plugin_version = '0.17.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -70,7 +71,7 @@ class WPUPolls {
         }
         $this->plugin_description = __('WPU Polls handle simple polls', 'wpu_polls');
         # CUSTOM TABLE
-        include dirname(__FILE__) . '/inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php';
+        require_once __DIR__ . '/inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php';
         $this->baseadmindatas = new \wpu_polls\WPUBaseAdminDatas();
         $this->baseadmindatas->init(array(
             'handle_database' => false,
@@ -95,6 +96,9 @@ class WPUPolls {
                 ),
                 'user_name' => array(
                     'public_name' => 'User name'
+                ),
+                'user_ip' => array(
+                    'public_name' => 'User IP'
                 ),
                 'gdpr' => array(
                     'public_name' => 'GDPR',
@@ -135,11 +139,11 @@ class WPUPolls {
                 'type' => 'textarea'
             )
         );
-        include dirname(__FILE__) . '/inc/WPUBaseSettings/WPUBaseSettings.php';
+        require_once __DIR__ . '/inc/WPUBaseSettings/WPUBaseSettings.php';
         $this->settings_obj = new \wpu_polls\WPUBaseSettings($this->settings_details, $this->settings);
 
         if (is_admin()) {
-            include dirname(__FILE__) . '/inc/WPUBaseMessages/WPUBaseMessages.php';
+            require_once __DIR__ . '/inc/WPUBaseMessages/WPUBaseMessages.php';
             $this->messages = new \wpu_polls\WPUBaseMessages($this->plugin_settings['id']);
         }
 
@@ -149,7 +153,7 @@ class WPUPolls {
         }
         $select_values[$this->nb_max] = __('Multiple', 'wpu_polls');
 
-        include dirname(__FILE__) . '/inc/WPUBaseFields/WPUBaseFields.php';
+        require_once __DIR__ . '/inc/WPUBaseFields/WPUBaseFields.php';
         $fields = array(
             'wpu_polls__nbanswers' => array(
                 'type' => 'select',
@@ -169,6 +173,11 @@ class WPUPolls {
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__settings',
                 'label' => __('Require user name and email to vote (use account details if loggedin)', 'wpu_polls')
+            ),
+            'wpu_polls__unique_ip' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__settings',
+                'label' => sprintf(__('An IP can vote only once per poll. Current IP: %s.', 'wpu_polls'), $this->get_user_ip_address())
             ),
             'wpu_polls__gdprcheckbox' => array(
                 'toggle-display' => array(
@@ -384,6 +393,7 @@ class WPUPolls {
         $answers = $this->get_post_answers(get_the_ID());
         $results = $this->get_votes_for_poll(get_the_ID());
         $answers_display = array();
+        $total_votes = 0;
 
         if (is_array($results['results']) && $results['nb_votes']) {
 
@@ -393,6 +403,9 @@ class WPUPolls {
                 if (isset($results['results'][$answer['uniqid']])) {
                     $nb_votes_str = __('1 vote', 'wpu_polls');
                     $nb_votes = $results['results'][$answer['uniqid']];
+                    if ($nb_votes) {
+                        $total_votes += $nb_votes;
+                    }
                     if ($nb_votes > 1) {
                         $nb_votes_str = sprintf(__('%d votes', 'wpu_polls'), $nb_votes);
                     }
@@ -421,6 +434,9 @@ class WPUPolls {
 
                 $short_results = $this->get_results_for_poll($post->ID);
                 echo '<h3>' . __('Votes', 'wpu_polls') . '</h3>';
+                if ($total_votes) {
+                    echo '<p>' . sprintf(__('Total number of votes: <b>%s</b>', 'wpu_polls'), $total_votes) . '</p>';
+                }
                 echo '<table class="widefat striped" id="wpu-polls-table-votes">';
                 echo '<thead>';
                 echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
@@ -460,6 +476,9 @@ class WPUPolls {
 
             } else {
                 echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
+                if ($total_votes) {
+                    echo '<p>' . sprintf(__('Total number of results: <b>%s</b>', 'wpu_polls'), $total_votes) . '</p>';
+                }
                 echo '<table contenteditable class="widefat striped">';
                 echo '<thead>';
                 echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
@@ -683,6 +702,21 @@ class WPUPolls {
             }
         }
 
+
+        /* Check if IP is unique */
+        $user_ip = $this->get_salted_ip_hash();
+        $unique_ip = get_post_meta($poll_id, 'wpu_polls__unique_ip', 1);
+
+        if($unique_ip){
+            global $wpdb;
+
+            /* Check IP */
+            $has_voted = $wpdb->get_row($wpdb->prepare("SELECT user_ip FROM " . $this->baseadmindatas->tablename . " WHERE user_ip=%s AND post_id=%d", $user_ip, $poll_id));
+            if (is_object($has_voted) && isset($has_voted->user_ip)) {
+                wp_send_json_error(array('stop_form' => true, 'mark_as_voted' => true, 'error_message' => __('You have already sent a reply', 'wpu_polls')));
+            }
+        }
+
         /* Check that every answers exists */
         $accepted_answers = array();
         foreach ($answers as $answer) {
@@ -704,6 +738,7 @@ class WPUPolls {
         foreach ($answers_ids as $answer_id) {
             $answer_data = array(
                 'post_id' => $poll_id,
+                'user_ip' => $user_ip,
                 'answer_id' => esc_html($answer_id)
             );
             if ($requiredetails == '1') {
@@ -802,6 +837,44 @@ class WPUPolls {
             wp_send_json_error();
         }
         wp_send_json($this->get_votes_for_poll($_POST['poll_id'], 1));
+    }
+
+    /* ----------------------------------------------------------
+      IP
+    ---------------------------------------------------------- */
+
+    function get_user_ip_address() {
+        $keys = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'];
+        foreach ($keys as $key) {
+            if (!isset($_SERVER[$key]) || empty($_SERVER[$key])) {
+                continue;
+            }
+            $ip_list = explode(',', $_SERVER[$key]);
+            foreach ($ip_list as $ip) {
+                $ip = trim($ip);
+                if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
+                    return $ip;
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Get an hash of the user IP address with a salt
+     * @return string IP Hash
+     */
+    function get_salted_ip_hash() {
+
+        /* Get salt or generate it */
+        $salt = get_option('wpu_polls_ip_salt');
+        if (!$salt) {
+            $salt = md5(time() . __FILE__);
+            update_option('wpu_polls_ip_salt', $salt);
+        }
+
+        /* Returns hash */
+        return md5($this->get_user_ip_address() . $salt);
     }
 
     /* ----------------------------------------------------------
