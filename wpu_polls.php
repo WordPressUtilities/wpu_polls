@@ -5,13 +5,14 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.17.0
+Version: 0.17.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
 Domain Path: /lang
 Requires at least: 6.2
 Requires PHP: 8.0
+Network: Optional
 License: MIT License
 License URI: https://opensource.org/licenses/MIT
 */
@@ -23,7 +24,7 @@ class WPUPolls {
     public $basefields;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.17.0';
+    private $plugin_version = '0.17.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -1037,7 +1038,7 @@ class WPUPolls {
             $html .= '</div>';
         } else {
             $html .= '<div data-nosnippet class="wpu-poll-results">';
-            $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
+            $html .= '<ul class="wpu-poll-results__list" data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
             $html .= $html_results;
             $html .= '</ul>';
             $html .= '</div>';

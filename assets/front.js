@@ -112,8 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         var $message = $main.find('.wpu-poll-main__message');
                         $main.attr('data-prevent-form', '1');
                         $message.html(response.data.error_message);
-                    }
-                    else {
+                    } else {
                         $button.prop('disabled', false);
                         $main.find('input:checked').prop('checked', false);
                     }
@@ -182,8 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
             _count_str = wpu_polls_settings.str_n_votes.replace('%d', _nb_results);
         }
         $item.attr('data-count', _nb_results);
-        $item.find('.percent').text(_percent + '%');
-        $item.find('.count').text(_count_str);
+        $item.find('.percent,[data-wpupolls-value="percent"]').text(_percent + '%');
+        $item.find('.count,[data-wpupolls-value="count"]').text(_count_str);
         $item.find('.bar-count').css('width', _percent + '%');
     }
 
