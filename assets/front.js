@@ -143,12 +143,15 @@ document.addEventListener('DOMContentLoaded', function() {
         var $answers = $wrapper.find('.wpu-poll-results'),
             $questions = $wrapper.find('.wpu-poll-main__answers'),
             _max_nb = parseInt($wrapper.attr('data-nb-votes-max'), 10),
+            _sort_results = parseInt($wrapper.attr('data-sort-results'), 10),
+            $list = $wrapper.find('.wpu-poll-results__list'),
+            $items = $answers.find('[data-results-id]'),
             _nb_votes_available,
             $tmp_item,
             _percent;
 
         /* Default content */
-        $answers.find('[data-results-id]').each(function(i, el) {
+        $items.each(function(i, el) {
             wpu_poll_build_results_item(jQuery(el), 0, 0);
         });
 
@@ -170,6 +173,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
+
+        if (_sort_results == '1') {
+            $items.sort(function(a, b) {
+                var countA = parseInt(a.getAttribute('data-count'));
+                var countB = parseInt(b.getAttribute('data-count'));
+                return countB - countA;
+            });
+
+            $items.each(function(i, el) {
+                el.setAttribute('data-i', i + 1);
+                $list.append(jQuery(el));
+            });
+        }
+
     }
 
     function wpu_poll_build_results_item($item, _nb_results, _percent) {

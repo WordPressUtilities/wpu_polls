@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.17.1
+Version: 0.18.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -24,7 +24,7 @@ class WPUPolls {
     public $basefields;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.17.1';
+    private $plugin_version = '0.18.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -206,6 +206,11 @@ class WPUPolls {
                 ),
                 'group' => 'wpu_polls__settings',
                 'label' => __('Custom text message after vote', 'wpu_polls')
+            ),
+            'wpu_polls__sort_results' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__settings',
+                'label' => __('Sort results by number of votes', 'wpu_polls')
             ),
             /* Poll */
             'wpu_polls__question' => array(
@@ -703,12 +708,11 @@ class WPUPolls {
             }
         }
 
-
         /* Check if IP is unique */
         $user_ip = $this->get_salted_ip_hash();
         $unique_ip = get_post_meta($poll_id, 'wpu_polls__unique_ip', 1);
 
-        if($unique_ip){
+        if ($unique_ip) {
             global $wpdb;
 
             /* Check IP */
@@ -927,6 +931,7 @@ class WPUPolls {
         $requiredetails = get_post_meta($poll_id, 'wpu_polls__requiredetails', 1);
         $displaymessage = get_post_meta($poll_id, 'wpu_polls__displaymessage', 1);
         $gdprcheckbox = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox', 1);
+        $sort_results = get_post_meta($poll_id, 'wpu_polls__sort_results', 1);
 
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
@@ -947,7 +952,7 @@ class WPUPolls {
         $html_main = '';
         $html_results = '';
         $has_answer_image = false;
-        foreach ($answers as $answer) {
+        foreach ($answers as $i => $answer) {
             $answer_id = $id_prefix . $answer['uniqid'];
             if ($answer['imagepreview']) {
                 $has_answer_image = true;
@@ -955,11 +960,13 @@ class WPUPolls {
 
             /* Main */
             $html_main .= '<li class="wpu-poll-main__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
+            $html_main .= '<div class="wpu-poll-main__answer-wrap" data-i="' . ($i + 1) . '">';
             $html_main .= $this->get_vote_content__item_main($poll_id, $answer_id, $answer, $nbanswers == 1 ? 'radio' : 'checkbox');
+            $html_main .= '</div>';
             $html_main .= '</li>';
 
             /* Results */
-            $html_results .= '<li class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
+            $html_results .= '<li data-i="' . ($i + 1) . '" class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
             $html_results .= $this->get_vote_content__item_results($answer_id, $answer);
             $html_results .= '</li>';
         }
@@ -975,7 +982,7 @@ class WPUPolls {
         }
 
         /* Wrapper start */
-        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-required-details="' . ($requiredetails ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="' . $has_voted . '" data-poll-id="' . $poll_id . '">';
+        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-required-details="' . ($requiredetails ? '1' : '0') . '" data-sort-results="' . ($sort_results ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="' . $has_voted . '" data-poll-id="' . $poll_id . '">';
 
         /* Questions */
         $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';
@@ -1037,7 +1044,7 @@ class WPUPolls {
             $html .= '<p>' . $displaymessage__content . '</p>';
             $html .= '</div>';
         } else {
-            $html .= '<div data-nosnippet class="wpu-poll-results">';
+            $html .= '<div data-nosnippet aria-live="polite" class="wpu-poll-results">';
             $html .= '<ul class="wpu-poll-results__list" data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
             $html .= $html_results;
             $html .= '</ul>';
