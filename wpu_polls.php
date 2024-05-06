@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.18.0
+Version: 0.18.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,17 +18,18 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
+    private $plugin_version = '0.18.1';
+    private $plugin_settings = array(
+        'id' => 'wpu_polls',
+        'name' => 'WPU Polls'
+    );
+    public $basetoolbox;
     public $messages;
     public $plugin_description;
     public $baseadmindatas;
     public $basefields;
     public $settings_details;
     public $settings;
-    private $plugin_version = '0.18.0';
-    private $plugin_settings = array(
-        'id' => 'wpu_polls',
-        'name' => 'WPU Polls'
-    );
     private $nb_max = 999999999999;
     private $settings_obj;
 
@@ -71,6 +72,12 @@ class WPUPolls {
             load_muplugin_textdomain('wpu_polls', $lang_dir);
         }
         $this->plugin_description = __('WPU Polls handle simple polls', 'wpu_polls');
+
+        require_once __DIR__ . '/inc/WPUBaseToolbox/WPUBaseToolbox.php';
+        $this->basetoolbox = new \wpu_polls\WPUBaseToolbox(array(
+            'need_form_js' => false
+        ));
+
         # CUSTOM TABLE
         require_once __DIR__ . '/inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php';
         $this->baseadmindatas = new \wpu_polls\WPUBaseAdminDatas();
@@ -178,7 +185,7 @@ class WPUPolls {
             'wpu_polls__unique_ip' => array(
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__settings',
-                'label' => sprintf(__('An IP can vote only once per poll. Current IP: %s.', 'wpu_polls'), $this->get_user_ip_address())
+                'label' => sprintf(__('An IP can vote only once per poll. Current IP: %s.', 'wpu_polls'), $this->basetoolbox->get_user_ip(false))
             ),
             'wpu_polls__gdprcheckbox' => array(
                 'toggle-display' => array(
@@ -847,24 +854,6 @@ class WPUPolls {
     /* ----------------------------------------------------------
       IP
     ---------------------------------------------------------- */
-
-    function get_user_ip_address() {
-        $keys = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'];
-        foreach ($keys as $key) {
-            if (!isset($_SERVER[$key]) || empty($_SERVER[$key])) {
-                continue;
-            }
-            $ip_list = explode(',', $_SERVER[$key]);
-            foreach ($ip_list as $ip) {
-                $ip = trim($ip);
-                if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
-                    return $ip;
-                }
-            }
-        }
-        return '';
-    }
-
     /**
      * Get an hash of the user IP address with a salt
      * @return string IP Hash
@@ -879,7 +868,7 @@ class WPUPolls {
         }
 
         /* Returns hash */
-        return md5($this->get_user_ip_address() . $salt);
+        return md5($this->basetoolbox->get_user_ip(false) . $salt);
     }
 
     /* ----------------------------------------------------------
