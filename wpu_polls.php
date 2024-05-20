@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.18.1
+Version: 0.18.2
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.18.1';
+    private $plugin_version = '0.18.2';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -258,13 +258,13 @@ class WPUPolls {
     public function wp_enqueue_scripts() {
         /* Front Script with localization / variables */
         wp_register_script('wpu_polls_front_script', plugins_url('assets/front.js', __FILE__), array('jquery'), $this->plugin_version, true);
-        wp_localize_script('wpu_polls_front_script', 'wpu_polls_settings', array(
+        wp_localize_script('wpu_polls_front_script', 'wpu_polls_settings', apply_filters('wpu_polls_front_script__wpu_polls_settings', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'str_0_vote' => __('No vote', 'wpu_polls'),
             'str_one_vote' => __('1 vote', 'wpu_polls'),
             'str_n_votes' => __('%d votes', 'wpu_polls'),
             'cacheurl' => $this->get_cache_path_dir('baseurl')
-        ));
+        )));
         wp_enqueue_script('wpu_polls_front_script');
         /* Front Style */
         wp_register_style('wpu_polls_front_style', plugins_url('assets/front.css', __FILE__), array(), $this->plugin_version);
