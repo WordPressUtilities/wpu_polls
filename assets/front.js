@@ -150,6 +150,17 @@ document.addEventListener('DOMContentLoaded', function() {
             $tmp_item,
             _percent;
 
+        /* If update time is available */
+        if (response.update_time) {
+            var tmp_update_time = parseInt($wrapper.attr('data-update-time'), 10),
+                response_update_time = parseInt(response.update_time, 10);
+            /* Stop refresh if data is the same */
+            if (tmp_update_time == response_update_time) {
+                return;
+            }
+            $wrapper.attr('data-update-time', response_update_time);
+        }
+
         /* Default content */
         $items.each(function(i, el) {
             wpu_poll_build_results_item(jQuery(el), 0, 0);

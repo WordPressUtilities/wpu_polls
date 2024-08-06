@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.18.2
+Version: 0.19.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.18.2';
+    private $plugin_version = '0.19.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -312,7 +312,7 @@ class WPUPolls {
         register_post_type('polls', $args);
     }
 
-    function manage_polls_posts_columns($columns) {
+    public function manage_polls_posts_columns($columns) {
         $new_columns = array();
         foreach ($columns as $k => $col) {
             $new_columns[$k] = $col;
@@ -323,13 +323,13 @@ class WPUPolls {
         return $new_columns;
     }
 
-    function manage_polls_posts_custom_column($column_key, $post_id) {
+    public function manage_polls_posts_custom_column($column_key, $post_id) {
         if ($column_key == 'poll_question') {
             echo get_post_meta($post_id, 'wpu_polls__question', 1);
         }
     }
 
-    function wpubasesettings_before_wrap_endsettings_page_wpu_polls() {
+    public function wpubasesettings_before_wrap_endsettings_page_wpu_polls() {
         $settings = $this->settings_obj->get_settings();
         if (!is_array($settings) || !isset($settings['public'])) {
             return;
@@ -349,7 +349,7 @@ class WPUPolls {
     /* Before view
     -------------------------- */
 
-    function before_admin_edit() {
+    public function before_admin_edit() {
         $screen = get_current_screen();
         if (!$screen) {
             return;
@@ -573,7 +573,7 @@ class WPUPolls {
         return $answers;
     }
 
-    function get_poll_nbvotesmax($poll_id) {
+    public function get_poll_nbvotesmax($poll_id) {
         /* Get number of votes */
         $nbvotesmax = get_post_meta($poll_id, 'wpu_polls__nbvotesmax', 1);
         if (!$nbvotesmax) {
@@ -764,7 +764,7 @@ class WPUPolls {
         return true;
     }
 
-    function get_results_for_poll($poll_id) {
+    public function get_results_for_poll($poll_id) {
         global $wpdb;
         $q = "SELECT * FROM " . $this->baseadmindatas->tablename . " WHERE post_id=%s";
         $prepared_query = $wpdb->prepare($q, $poll_id);
@@ -804,6 +804,7 @@ class WPUPolls {
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
         $data = array(
+            'update_time' => time(),
             'nbvotesmax' => $nbvotesmax,
             'poll_id' => $poll_id,
             'nb_votes' => $nb_votes,
@@ -858,7 +859,7 @@ class WPUPolls {
      * Get an hash of the user IP address with a salt
      * @return string IP Hash
      */
-    function get_salted_ip_hash() {
+    public function get_salted_ip_hash() {
 
         /* Get salt or generate it */
         $salt = get_option('wpu_polls_ip_salt');
@@ -875,7 +876,7 @@ class WPUPolls {
       User
     ---------------------------------------------------------- */
 
-    function edit_user_box($profile_user) {
+    public function edit_user_box($profile_user) {
         if (!is_object($profile_user)) {
             return;
         }
@@ -1050,7 +1051,7 @@ class WPUPolls {
 
     }
 
-    function get_vote_content__item_main($poll_id, $answer_id, $answer, $type = 'checkbox') {
+    public function get_vote_content__item_main($poll_id, $answer_id, $answer, $type = 'checkbox') {
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
         $html_main = '';
         if ($answer['imagepreview']) {
@@ -1065,7 +1066,7 @@ class WPUPolls {
         return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);
     }
 
-    function get_vote_content__item_results($answer_id, $answer) {
+    public function get_vote_content__item_results($answer_id, $answer) {
         $html_results = $answer['imagepreview'];
         $html_results .= '<div class="answer__inner">';
         $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span><span class="count"></span><span class="percent"></span></span>';
