@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.19.0
+Version: 0.19.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.19.0';
+    private $plugin_version = '0.19.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -643,6 +643,7 @@ class WPUPolls {
             );
         }
         update_post_meta($post_id, 'wpu_polls__answers', $answers);
+        update_post_meta($post_id, 'wpu_polls__last_update', time());
         wp_update_post(array(
             'ID' => $post_id,
             'post_content' => '[wpu_polls id="' . $post_id . '"]'
@@ -761,6 +762,9 @@ class WPUPolls {
             }
             $this->baseadmindatas->create_line($answer_data);
         }
+
+        update_post_meta($poll_id, 'wpu_polls__last_update', time());
+
         return true;
     }
 
@@ -803,8 +807,14 @@ class WPUPolls {
 
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
+        $last_update_time = get_post_meta($poll_id, 'wpu_polls__last_update', 1);
+        if (!$last_update_time) {
+            $last_update_time = time();
+            update_post_meta($poll_id, 'wpu_polls__last_update', $last_update_time);
+        }
+
         $data = array(
-            'update_time' => time(),
+            'update_time' => $last_update_time,
             'nbvotesmax' => $nbvotesmax,
             'poll_id' => $poll_id,
             'nb_votes' => $nb_votes,
