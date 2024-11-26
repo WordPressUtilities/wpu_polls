@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             /* Update vote counter */
             jQuery.ajax({
                 dataType: "json",
+                cache: false,
                 url: wpu_polls_settings.cacheurl + _poll_id + '.json',
                 success: function(response) {
                     wpu_poll_build_results($wrapper, response);

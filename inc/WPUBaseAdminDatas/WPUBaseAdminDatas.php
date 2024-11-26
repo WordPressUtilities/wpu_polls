@@ -4,7 +4,7 @@ namespace wpu_polls;
 /*
 Class Name: WPU Base Admin Datas
 Description: A class to handle datas in WordPress admin
-Version: 4.1.0
+Version: 4.3.0
 Class URI: https://github.com/WordPressUtilities/wpubaseplugin
 Author: Darklg
 Author URI: https://darklg.me/
@@ -273,6 +273,9 @@ class WPUBaseAdminDatas {
         if (current_user_can($this->user_level) && !empty($_POST) && isset($_POST['admindatas_fields'], $_POST['page']) && is_array($_POST['admindatas_fields'])) {
             $action_id = 'action-create-form-admin-datas-' . $_POST['page'];
             if (isset($_POST[$action_id]) && wp_verify_nonce($_POST[$action_id], 'action-create-form-' . $_POST['page'])) {
+                if (isset($_POST['backslash_test']) && $_POST['backslash_test'] != "'") {
+                    $_POST['admindatas_fields'] = array_map('stripslashes_deep', $_POST['admindatas_fields']);
+                }
                 $_return_value = $this->create_line($_POST['admindatas_fields']);
             }
         }
@@ -323,6 +326,9 @@ class WPUBaseAdminDatas {
         if (current_user_can($this->user_level) && !empty($_POST) && isset($_POST['edit_line'], $_POST['admindatas_fields'], $_POST['page']) && is_numeric($_POST['edit_line']) && is_array($_POST['admindatas_fields'])) {
             $action_id = 'action-edit-form-admin-datas-' . $_POST['page'];
             if (isset($_POST[$action_id]) && wp_verify_nonce($_POST[$action_id], 'action-edit-form-' . $_POST['page'])) {
+                if (isset($_POST['backslash_test']) && $_POST['backslash_test'] != "'") {
+                    $_POST['admindatas_fields'] = array_map('stripslashes_deep', $_POST['admindatas_fields']);
+                }
                 $this->edit_line($_POST['edit_line'], $_POST['admindatas_fields']);
             }
         }
@@ -450,7 +456,7 @@ class WPUBaseAdminDatas {
     ---------------------------------------------------------- */
 
     public function export_array_to_csv($array, $name) {
-        _deprecated_function('export_array_to_csv', '4.1.0');
+        _deprecated_function('export_array_to_csv', '4.3.0');
 
         if (isset($array[0])) {
             header('Content-Type: application/csv');
@@ -484,7 +490,7 @@ class WPUBaseAdminDatas {
         $this->export_datas();
     }
 
-    /* Thanks to https://stackoverflow.com/a/55482704 */
+    /* Thanks to https://stackoverflow.com/a/554.3.04 */
     public function export_datas() {
         global $wpdb;
 
@@ -620,6 +626,7 @@ class WPUBaseAdminDatas {
         $_html .= '</tbody></table>';
 
         if ($_has_form) {
+            $_html .= '<input type="hidden" name="backslash_test" value="\'" />';
             $_html .= get_submit_button(__('Submit'), '', 'submit', false);
             $_html .= '</form>';
         }
@@ -779,19 +786,21 @@ class WPUBaseAdminDatas {
 
         $start_element = max(0, ($args['pagenum'] - 1) * $args['perpage'] + 1);
         $end_element = min($args['pagenum'] * $args['perpage'], $args['max_elements']);
-        $pagination = '<div style="margin:1em 0" class="tablenav">';
-        $pagination .= '<div class="alignleft">';
-        $pagination .= sprintf(__('Items %s - %s', $this->settings['plugin_id']), $start_element, $end_element);
-        if ($total_nb) {
-            $pagination .= ' / ' . $total_nb;
-        }
-        $pagination .= '</div>';
-        if ($page_links) {
-            $page_links = str_replace($this->slash_replacement, '\/', $page_links);
-            $pagination .= '<div class="tablenav-pages alignright actions bulkactions">' . $page_links . '</div>';
-        }
-        $pagination .= '<br class="clear" /></div>';
+        if ($args['max_elements']) {
+            $pagination = '<div style="margin:1em 0" class="tablenav">';
+            $pagination .= '<div class="alignleft">';
+            $pagination .= sprintf(__('Items %s - %s', $this->settings['plugin_id']), $start_element, $end_element);
+            if ($total_nb) {
+                $pagination .= ' / ' . $total_nb;
+            }
+            $pagination .= '</div>';
 
+            if ($page_links) {
+                $page_links = str_replace($this->slash_replacement, '\/', $page_links);
+                $pagination .= '<div class="tablenav-pages alignright actions bulkactions">' . $page_links . '</div>';
+            }
+            $pagination .= '<br class="clear" /></div>';
+        }
         $clear_form = '';
         if ($has_filter_key) {
             $clear_form .= '<p class="admindatas-search-filter">';
@@ -893,7 +902,7 @@ class WPUBaseAdminDatas {
         $content .= $search_form;
         $content .= $pagination;
 
-        if ($args['has_export']) {
+        if ($args['has_export'] && $args['max_elements']) {
             $content .= '<a href="' . admin_url($export_url_base) . '">' . __('Export all', $this->settings['plugin_id']) . '</a>';
             if (!empty($query_args)) {
                 $content .= ' <a href="' . $this->build_url(admin_url($export_url_base), $query_args) . '">' . __('Export filtered view', $this->settings['plugin_id']) . '</a>';

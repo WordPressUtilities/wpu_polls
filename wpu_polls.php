@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.19.1
+Version: 0.20.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.19.1';
+    private $plugin_version = '0.20.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -34,7 +34,9 @@ class WPUPolls {
     private $settings_obj;
 
     public function __construct() {
-        add_filter('plugins_loaded', array(&$this, 'plugins_loaded'));
+        add_action('plugins_loaded', array(&$this, 'load_admin_datas'));
+        add_action('init', array(&$this, 'load_translation'));
+        add_action('init', array(&$this, 'load_plugin_dependencies'));
 
         # Post type
         add_action('init', array(&$this, 'register_post_type'));
@@ -65,19 +67,18 @@ class WPUPolls {
         add_action('wpubasesettings_before_wrap_endsettings_page_wpu_polls', array(&$this, 'wpubasesettings_before_wrap_endsettings_page_wpu_polls'));
     }
 
-    public function plugins_loaded() {
-        # TRANSLATION
+    # TRANSLATION
+    public function load_translation() {
         $lang_dir = dirname(plugin_basename(__FILE__)) . '/lang/';
-        if (!load_plugin_textdomain('wpu_polls', false, $lang_dir)) {
+        if (strpos(__DIR__, 'mu-plugins') !== false) {
             load_muplugin_textdomain('wpu_polls', $lang_dir);
+        } else {
+            load_plugin_textdomain('wpu_polls', false, $lang_dir);
         }
         $this->plugin_description = __('WPU Polls handle simple polls', 'wpu_polls');
+    }
 
-        require_once __DIR__ . '/inc/WPUBaseToolbox/WPUBaseToolbox.php';
-        $this->basetoolbox = new \wpu_polls\WPUBaseToolbox(array(
-            'need_form_js' => false
-        ));
-
+    public function load_admin_datas() {
         # CUSTOM TABLE
         require_once __DIR__ . '/inc/WPUBaseAdminDatas/WPUBaseAdminDatas.php';
         $this->baseadmindatas = new \wpu_polls\WPUBaseAdminDatas();
@@ -114,6 +115,15 @@ class WPUPolls {
                 )
             )
         ));
+    }
+
+    public function load_plugin_dependencies() {
+
+        require_once __DIR__ . '/inc/WPUBaseToolbox/WPUBaseToolbox.php';
+        $this->basetoolbox = new \wpu_polls\WPUBaseToolbox(array(
+            'need_form_js' => false
+        ));
+
         # SETTINGS
         $this->settings_details = array(
             # Admin page
