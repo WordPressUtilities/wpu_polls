@@ -14,6 +14,7 @@
         "no-undef": 1
     },
     "globals": {
+        "wpu_polls_settings": true,
         "wpu_polls_options": true,
         "wp": true,
         "jQuery": true

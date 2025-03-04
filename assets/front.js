@@ -31,12 +31,19 @@ document.addEventListener('DOMContentLoaded', function() {
     jQuery('.wpu-poll-main__wrapper[data-nb-answers] .wpu-poll-main__answers').on('change', 'input[type="checkbox"]', function() {
         var $this = jQuery(this),
             $wrapper = $this.closest('.wpu-poll-main__wrapper'),
+            _minAnswers = parseInt($wrapper.attr('data-min-answers'), 10),
             _maxNb = parseInt($wrapper.attr('data-nb-answers'), 10);
         var _checkedBoxes = $wrapper.find('.wpu-poll-main__answers input[type="checkbox"]:checked').length;
 
         /* Prevent selecting too many answers */
         if (_checkedBoxes > _maxNb) {
             $this.prop('checked', false);
+        }
+
+        if (_minAnswers > 0 && _checkedBoxes < _minAnswers) {
+            $wrapper.attr('data-min-answers-locked', 1);
+        } else {
+            $wrapper.attr('data-min-answers-locked', 0);
         }
 
         /* Visual indicator */
@@ -59,7 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
             $user_name = $main.find('[name="user_name"]'),
             $user_email = $main.find('[name="user_email"]'),
             $user_gdpr = $main.find('[name="user_gdpr"]'),
-            $answers = $main.find('.wpu-poll-main__answers');
+            $answers = $main.find('.wpu-poll-main__answers'),
+            _minAnswers = parseInt($main.attr('data-min-answers'), 10);
 
         /* Extract poll id */
         var _poll_id = $main.attr('data-poll-id');
@@ -67,6 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
         /* Check value */
         var $checkboxes = $answers.find('input[name="answers"]:checked');
         if (!$checkboxes.length) {
+            return false;
+        }
+
+        if(_minAnswers > 0 && $checkboxes.length < _minAnswers) {
             return false;
         }
 

@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.20.0
+Version: 0.21.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.20.0';
+    private $plugin_version = '0.21.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -178,6 +178,13 @@ class WPUPolls {
                 'default_value' => $this->nb_max,
                 'group' => 'wpu_polls__settings',
                 'label' => __('User can choose this number of answers :', 'wpu_polls'),
+                'data' => $select_values
+            ),
+            'wpu_polls__nbanswers_min' => array(
+                'type' => 'select',
+                'default_value' => 1,
+                'group' => 'wpu_polls__settings',
+                'label' => __('User should select at least this number of answers :', 'wpu_polls'),
                 'data' => $select_values
             ),
             'wpu_polls__nbvotesmax' => array(
@@ -592,6 +599,15 @@ class WPUPolls {
         return intval($nbvotesmax, 10);
     }
 
+    public function get_poll_nbanswers_min($poll_id) {
+        /* Get number of votes */
+        $nbanswers_min = get_post_meta($poll_id, 'wpu_polls__nbanswers_min', 1);
+        if (!$nbanswers_min) {
+            $nbanswers_min = 1;
+        }
+        return intval($nbanswers_min, 10);
+    }
+
     /* Save poll
     -------------------------- */
 
@@ -685,6 +701,12 @@ class WPUPolls {
         /* Get number of votes */
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
+        $min_answers = $this->get_poll_nbanswers_min($poll_id);
+
+        if (count($answers_ids) < $min_answers) {
+            wp_send_json_error(array('stop_form' => true, 'mark_as_voted' => false, 'error_message' => __('Not enough answers', 'wpu_polls')));
+        }
+
         /* Retrieve votes */
         $votes = $this->get_votes_for_poll($poll_id);
 
@@ -745,6 +767,8 @@ class WPUPolls {
         foreach ($answers as $answer) {
             $accepted_answers[] = $answer['uniqid'];
         }
+
+
 
         foreach ($answers_ids as $answer_id) {
             /* Answer does not exists */
@@ -942,7 +966,7 @@ class WPUPolls {
         $displaymessage = get_post_meta($poll_id, 'wpu_polls__displaymessage', 1);
         $gdprcheckbox = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox', 1);
         $sort_results = get_post_meta($poll_id, 'wpu_polls__sort_results', 1);
-
+        $min_answers = $this->get_poll_nbanswers_min($poll_id);
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
         $question = get_post_meta($poll_id, 'wpu_polls__question', 1);
@@ -992,7 +1016,22 @@ class WPUPolls {
         }
 
         /* Wrapper start */
-        $html = '<div class="wpu-poll-main__wrapper" ' . ($nbanswers > 1 ? ' data-nb-answers="' . $nbanswers . '"' : '') . ' data-has-image="' . ($has_answer_image ? '1' : '0') . '" data-has-required-details="' . ($requiredetails ? '1' : '0') . '" data-sort-results="' . ($sort_results ? '1' : '0') . '" data-nb-votes-max="' . $nbvotesmax . '" data-has-voted="' . $has_voted . '" data-poll-id="' . $poll_id . '">';
+
+        $wrapper_attributes = array(
+            'data-has-image' => $has_answer_image ? '1' : '0',
+            'data-has-required-details' => $requiredetails ? '1' : '0',
+            'data-min-answers' => $min_answers,
+            'data-min-answers-locked' => '1',
+            'data-sort-results' => $sort_results ? '1' : '0',
+            'data-nb-votes-max' => $nbvotesmax,
+            'data-has-voted' => $has_voted,
+            'data-poll-id' => $poll_id
+        );
+        if ($nbanswers > 1) {
+            $wrapper_attributes['data-nb-answers'] = $nbanswers;
+        }
+
+        $html = '<div class="wpu-poll-main__wrapper" ' . $this->basetoolbox->array_to_html_attributes($wrapper_attributes) . '>';
 
         /* Questions */
         $html .= '<h3 class="wpu-poll-main__question">' . $question . '</h3>';
@@ -1026,7 +1065,7 @@ class WPUPolls {
                         $gdpr_message = $settings['gdpr_message'];
                     }
                 }
-                $gdpr_message = nl2br(trim(strip_tags($gdpr_message)));
+                $gdpr_message = nl2br(trim(wp_strip_all_tags($gdpr_message)));
                 $gdpr_message = apply_filters('wpu_polls__gdprcheckbox__text', $gdpr_message, $poll_id);
                 $html .= '<p>';
                 $html .= '<input value="1" id="' . $id_prefix . '_gdpr" name="user_gdpr" type="checkbox" />';
@@ -1048,7 +1087,7 @@ class WPUPolls {
                     $displaymessage__content = $settings['success_message'];
                 }
             }
-            $displaymessage__content = nl2br(trim(strip_tags($displaymessage__content)));
+            $displaymessage__content = nl2br(trim(wp_strip_all_tags($displaymessage__content)));
             $displaymessage__content = apply_filters('wpu_polls__displaymessage__content', $displaymessage__content, $poll_id);
             $html .= '<div data-nosnippet class="wpu-poll-success-message">';
             $html .= '<p>' . $displaymessage__content . '</p>';
