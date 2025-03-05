@@ -54,6 +54,7 @@
 }
 
 .wpu-poll-main__answer[data-disabled="1"],
+[data-required-details-valid="0"] .wpu-poll-main__submit,
 [data-min-answers-locked="1"] .wpu-poll-main__submit,
 [data-max-answers-locked="1"] .wpu-poll-main__answer:not([data-checked="1"]) {
     opacity: 0.50;

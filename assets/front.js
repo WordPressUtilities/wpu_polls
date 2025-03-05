@@ -55,6 +55,46 @@ document.addEventListener('DOMContentLoaded', function() {
         $this.closest('.wpu-poll-main__answer').attr('data-checked', $this.prop('checked') ? '1' : '0');
     });
 
+    jQuery('.wpu-poll-main__wrapper').each(function() {
+        var $wrapper = jQuery(this),
+            $details_area = $wrapper.find('.wpu-polls-require-details-area');
+
+        // Check validity of detail fields
+        if ($details_area.length) {
+            return;
+        }
+        var $fields = $details_area.find('input, textarea, select');
+
+        // Track if all fields are valid
+        var checkDetailsFieldsValidity = function() {
+            var allFieldsValid = true;
+
+            $fields.each(function() {
+                var $field = jQuery(this);
+                var field = $field.get(0);
+
+                /* Check if field has a required attribute and is empty */
+                if ($field.attr('required') && !$field.val().trim()) {
+                    allFieldsValid = false;
+                }
+                /* Check validity using the browser's validation API */
+                if (field && typeof field.checkValidity === 'function' && !field.checkValidity()) {
+                    allFieldsValid = false;
+                }
+            });
+
+            // Update form state
+            $wrapper.attr('data-required-details-valid', allFieldsValid ? '1' : '0');
+        };
+
+        // Initial validation check
+        checkDetailsFieldsValidity();
+
+        // Recheck on input change
+        $fields.on('input change', checkDetailsFieldsValidity);
+
+    });
+
     /* Vote */
     jQuery('.wpu-poll-main__submit button').on('click', function(e) {
         e.preventDefault();
@@ -78,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        if(_minAnswers > 0 && $checkboxes.length < _minAnswers) {
+        if (_minAnswers > 0 && $checkboxes.length < _minAnswers) {
             return false;
         }
 
