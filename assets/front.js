@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     /* Mark as voted */
-                    if (response.data.hasOwnProperty('mark_as_voted') && response.data.hasOwnProperty('mark_as_voted')) {
+                    if (response.data.hasOwnProperty('mark_as_voted') && response.data.mark_as_voted) {
                         localStorage.setItem('wpu_polls_' + _poll_id, '1');
                     }
 
@@ -212,6 +212,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             $wrapper.attr('data-update-time', response_update_time);
+        }
+
+        /* Closed */
+        if (response.is_closed) {
+            $wrapper.attr('data-is-closed', 1);
+            $wrapper.find('.wpu-poll-main').remove();
         }
 
         /* Default content */

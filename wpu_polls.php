@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.21.1
+Version: 0.22.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.21.1';
+    private $plugin_version = '0.22.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -155,6 +155,10 @@ class WPUPolls {
             'success_message' => array(
                 'label' => __('Default Success Message', 'wpu_polls'),
                 'type' => 'textarea'
+            ),
+            'closed_message' => array(
+                'label' => __('Default Closed Poll Message', 'wpu_polls'),
+                'type' => 'textarea'
             )
         );
         require_once __DIR__ . '/inc/WPUBaseSettings/WPUBaseSettings.php';
@@ -177,7 +181,7 @@ class WPUPolls {
                 'type' => 'select',
                 'default_value' => $this->nb_max,
                 'group' => 'wpu_polls__settings',
-                'label' => __('User can choose this number of answers :', 'wpu_polls'),
+                'label' => __('User can select at most this number of answers :', 'wpu_polls'),
                 'data' => $select_values
             ),
             'wpu_polls__nbanswers_min' => array(
@@ -202,7 +206,9 @@ class WPUPolls {
             'wpu_polls__unique_ip' => array(
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__settings',
-                'label' => sprintf(__('An IP can vote only once per poll. Current IP: %s.', 'wpu_polls'), $this->basetoolbox->get_user_ip(false))
+                'label' => __('An IP can vote only once per poll.', 'wpu_polls'),
+                'help' => sprintf(__('Current IP: %s.', 'wpu_polls'), $this->basetoolbox->get_user_ip(false)),
+
             ),
             'wpu_polls__gdprcheckbox' => array(
                 'toggle-display' => array(
@@ -219,22 +225,47 @@ class WPUPolls {
                 'group' => 'wpu_polls__settings',
                 'label' => __('Custom GDPR message', 'wpu_polls')
             ),
+            /* Success */
             'wpu_polls__displaymessage' => array(
                 'type' => 'checkbox',
-                'group' => 'wpu_polls__settings',
+                'group' => 'wpu_polls__success',
                 'label' => __('Display a message after vote instead of the results', 'wpu_polls')
             ),
             'wpu_polls__displaymessage__content' => array(
                 'toggle-display' => array(
                     'wpu_polls__displaymessage' => 'checked'
                 ),
-                'group' => 'wpu_polls__settings',
+                'group' => 'wpu_polls__success',
                 'label' => __('Custom text message after vote', 'wpu_polls')
             ),
             'wpu_polls__sort_results' => array(
                 'type' => 'checkbox',
-                'group' => 'wpu_polls__settings',
+                'group' => 'wpu_polls__success',
                 'label' => __('Sort results by number of votes', 'wpu_polls')
+            ),
+            /* Closed */
+            'wpu_polls__poll_closed' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__closed',
+                'label' => __('Close this poll now', 'wpu_polls')
+            ),
+            'wpu_polls__poll_closed__date' => array(
+                'group' => 'wpu_polls__closed',
+                'label' => __('Close this poll on :', 'wpu_polls'),
+                'help' => sprintf(__('Current date: %s', 'wpu_polls'), current_time('Y-m-d H:i')),
+                'type' => 'datetime'
+            ),
+            'wpu_polls__poll_closed__displaymessage' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__closed',
+                'label' => __('Display a message when poll is closed instead of the results', 'wpu_polls')
+            ),
+            'wpu_polls__poll_closed__displaymessage_content' => array(
+                'toggle-display' => array(
+                    'wpu_polls__poll_closed__displaymessage' => 'checked'
+                ),
+                'group' => 'wpu_polls__closed',
+                'label' => __('Custom message for closed poll', 'wpu_polls')
             ),
             /* Poll */
             'wpu_polls__question' => array(
@@ -246,6 +277,14 @@ class WPUPolls {
         $field_groups = array(
             'wpu_polls__settings' => array(
                 'label' => __('Settings', 'wpu_polls'),
+                'post_type' => 'polls'
+            ),
+            'wpu_polls__success' => array(
+                'label' => __('Success message and results', 'wpu_polls'),
+                'post_type' => 'polls'
+            ),
+            'wpu_polls__closed' => array(
+                'label' => __('Closed poll settings', 'wpu_polls'),
                 'post_type' => 'polls'
             ),
             'wpu_polls__poll' => array(
@@ -675,6 +714,8 @@ class WPUPolls {
             'post_content' => '[wpu_polls id="' . $post_id . '"]'
         ));
 
+        $this->get_votes_for_poll($post_id, true);
+
     }
 
     /* ----------------------------------------------------------
@@ -686,6 +727,11 @@ class WPUPolls {
     private function add_votes($poll_id, $answers_ids, $post = array()) {
         if (!is_numeric($poll_id) || !is_array($answers_ids)) {
             wp_send_json_error(array('stop_form' => true, 'mark_as_voted' => false, 'error_message' => __('Invalid poll', 'wpu_polls')));
+        }
+
+        $wpu_polls__poll_closed = $this->is_poll_closed($poll_id);
+        if ($wpu_polls__poll_closed) {
+            wp_send_json_error(array('stop_form' => true, 'mark_as_voted' => false, 'error_message' => __('Poll is closed', 'wpu_polls')));
         }
 
         $answers_ids = array_unique($answers_ids);
@@ -851,6 +897,7 @@ class WPUPolls {
             'update_time' => $last_update_time,
             'nbvotesmax' => $nbvotesmax,
             'poll_id' => $poll_id,
+            'is_closed' => $this->is_poll_closed($poll_id),
             'nb_votes' => $nb_votes,
             'results' => $new_results
         );
@@ -964,6 +1011,8 @@ class WPUPolls {
 
         $requiredetails = get_post_meta($poll_id, 'wpu_polls__requiredetails', 1);
         $displaymessage = get_post_meta($poll_id, 'wpu_polls__displaymessage', 1);
+        $is_closed = $this->is_poll_closed($poll_id);
+        $displaymessage_closed = get_post_meta($poll_id, 'wpu_polls__poll_closed__displaymessage', 1);
         $gdprcheckbox = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox', 1);
         $sort_results = get_post_meta($poll_id, 'wpu_polls__sort_results', 1);
         $min_answers = $this->get_poll_nbanswers_min($poll_id);
@@ -1025,6 +1074,7 @@ class WPUPolls {
             'data-sort-results' => $sort_results ? '1' : '0',
             'data-nb-votes-max' => $nbvotesmax,
             'data-has-voted' => $has_voted,
+            'data-is-closed' => $is_closed ? '1' : '0',
             'data-poll-id' => $poll_id
         );
         if ($nbanswers > 1) {
@@ -1079,19 +1129,35 @@ class WPUPolls {
         $html .= '</div>';
 
         /* Results */
-        if ($displaymessage) {
-            $displaymessage__content = get_post_meta($poll_id, 'wpu_polls__displaymessage__content', 1);
-            if (!$displaymessage__content) {
-                $displaymessage__content = apply_filters('wpu_polls__success_message', __('Thank you for your vote !', 'wpu_polls'));
-                if (isset($settings['success_message']) && $settings['success_message']) {
-                    $displaymessage__content = $settings['success_message'];
+        if ((!$is_closed && $displaymessage) || ($is_closed && $displaymessage_closed)) {
+            if ($displaymessage) {
+                $displaymessage__content = get_post_meta($poll_id, 'wpu_polls__displaymessage__content', 1);
+                if (!$displaymessage__content) {
+                    $displaymessage__content = apply_filters('wpu_polls__success_message', __('Thank you for your vote !', 'wpu_polls'));
+                    if (isset($settings['success_message']) && $settings['success_message']) {
+                        $displaymessage__content = $settings['success_message'];
+                    }
                 }
+                $displaymessage__content = nl2br(trim(wp_strip_all_tags($displaymessage__content)));
+                $displaymessage__content = apply_filters('wpu_polls__displaymessage__content', $displaymessage__content, $poll_id);
+                $html .= '<div data-nosnippet class="wpu-poll-success-message">';
+                $html .= '<p>' . $displaymessage__content . '</p>';
+                $html .= '</div>';
             }
-            $displaymessage__content = nl2br(trim(wp_strip_all_tags($displaymessage__content)));
-            $displaymessage__content = apply_filters('wpu_polls__displaymessage__content', $displaymessage__content, $poll_id);
-            $html .= '<div data-nosnippet class="wpu-poll-success-message">';
-            $html .= '<p>' . $displaymessage__content . '</p>';
-            $html .= '</div>';
+            if ($displaymessage_closed) {
+                $closedmessage__content = get_post_meta($poll_id, 'wpu_polls__poll_closed__displaymessage_content', 1);
+                if (!$closedmessage__content) {
+                    $closedmessage__content = apply_filters('wpu_polls__closed_message', __('Poll is closed', 'wpu_polls'));
+                    if (isset($settings['closed_message']) && $settings['closed_message']) {
+                        $closedmessage__content = $settings['closed_message'];
+                    }
+                }
+                $closedmessage__content = nl2br(trim(wp_strip_all_tags($closedmessage__content)));
+                $closedmessage__content = apply_filters('wpu_polls__closedmessage__content', $closedmessage__content, $poll_id);
+                $html .= '<div data-nosnippet class="wpu-poll-closed-message">';
+                $html .= '<p>' . $closedmessage__content . '</p>';
+                $html .= '</div>';
+            }
         } else {
             $html .= '<div data-nosnippet aria-live="polite" class="wpu-poll-results">';
             $html .= '<ul class="wpu-poll-results__list" data-has-image="' . ($has_answer_image ? '1' : '0') . '">';
@@ -1133,6 +1199,19 @@ class WPUPolls {
         $html_results .= '</div>';
 
         return apply_filters('wpu_polls__get_vote_content__item_results__html', $html_results, $answer_id, $answer);
+    }
+
+    public function is_poll_closed($poll_id) {
+        if (get_post_meta($poll_id, 'wpu_polls__poll_closed', 1)) {
+            return true;
+        }
+
+        $closed_date = get_post_meta($poll_id, 'wpu_polls__poll_closed__date', 1);
+        if ($closed_date && strtotime($closed_date) < current_time('U')) {
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -28,14 +28,30 @@
     pointer-events: none;
 }
 
+/* Form is loading */
+
 .wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-main,
+.wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-closed-message,
 .wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-success-message,
 .wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-success,
-.wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-results,
+.wpu-poll-main__wrapper[data-prevent-form="1"] .wpu-poll-results {
+    display: none;
+}
+
+/* Handle vote status */
+
 .wpu-poll-main__wrapper[data-has-voted="1"] .wpu-poll-main,
 .wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-success-message,
 .wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-success,
-.wpu-poll-main__wrapper:not([data-has-voted="1"]) .wpu-poll-results {
+.wpu-poll-main__wrapper:not([data-is-closed="1"]):not([data-has-voted="1"]) .wpu-poll-results {
+    display: none;
+}
+
+/* Handle closed status */
+
+.wpu-poll-main__wrapper[data-is-closed="1"] .wpu-poll-main,
+.wpu-poll-main__wrapper[data-is-closed="1"] .wpu-poll-success-message,
+.wpu-poll-main__wrapper:not([data-is-closed="1"]) .wpu-poll-closed-message {
     display: none;
 }
 
