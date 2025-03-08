@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2025-03-07 16:42+0100\n"
+"POT-Creation-Date: 2025-03-08 23:58+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -45,7 +45,7 @@ msgstr "Retirer l’image"
 msgid "This field is invalid"
 msgstr "Ce champ est invalide"
 
-#: inc/WPUBaseToolbox/WPUBaseToolbox.php:169 wpu_polls.php:1128
+#: inc/WPUBaseToolbox/WPUBaseToolbox.php:169 wpu_polls.php:1132
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -225,15 +225,15 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:319 wpu_polls.php:471
+#: wpu_polls.php:319 wpu_polls.php:475
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:320 wpu_polls.php:473
+#: wpu_polls.php:320 wpu_polls.php:477
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:321 wpu_polls.php:479
+#: wpu_polls.php:321 wpu_polls.php:483
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
@@ -310,121 +310,125 @@ msgstr "Liste des sondages"
 msgid "The vote has been successfully deleted."
 msgstr "Le vote a été supprimé avec succès."
 
-#: wpu_polls.php:449
+#: wpu_polls.php:446
+msgid "This poll is closed."
+msgstr "Ce sondage est fermé."
+
+#: wpu_polls.php:453
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:450 wpu_polls.php:511 wpu_polls.php:553
+#: wpu_polls.php:454 wpu_polls.php:515 wpu_polls.php:557
 msgid "Answer"
 msgstr "Réponse"
 
-#: wpu_polls.php:460
+#: wpu_polls.php:464
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:505 wpu_polls.php:554 wpu_polls.php:984
+#: wpu_polls.php:509 wpu_polls.php:558 wpu_polls.php:988
 msgid "Votes"
 msgstr "Votes"
 
-#: wpu_polls.php:507
+#: wpu_polls.php:511
 #, php-format
 msgid "Total number of votes: <b>%s</b>"
 msgstr "Nombre total de votes: <b>%s</b>"
 
-#: wpu_polls.php:512 wpu_polls.php:1108
+#: wpu_polls.php:516 wpu_polls.php:1112
 msgid "Name"
 msgstr "Nom"
 
-#: wpu_polls.php:513 wpu_polls.php:1109
+#: wpu_polls.php:517 wpu_polls.php:1113
 msgid "Email"
 msgstr "E-mail"
 
-#: wpu_polls.php:514
+#: wpu_polls.php:518
 msgid "User"
 msgstr "Utilisateur"
 
-#: wpu_polls.php:515
+#: wpu_polls.php:519
 msgid "GDPR"
 msgstr "RGPD"
 
-#: wpu_polls.php:527
+#: wpu_polls.php:531
 #, php-format
 msgid "#%s"
 msgstr "#%s"
 
-#: wpu_polls.php:544
+#: wpu_polls.php:548
 msgid "Export results"
 msgstr "Exporter les résultats"
 
-#: wpu_polls.php:547
+#: wpu_polls.php:551
 msgid "Results"
 msgstr "Résultats"
 
-#: wpu_polls.php:549
+#: wpu_polls.php:553
 #, php-format
 msgid "Total number of results: <b>%s</b>"
 msgstr "Nombre total de résultats: <b>%s</b>"
 
-#: wpu_polls.php:555
+#: wpu_polls.php:559
 msgid "Percent"
 msgstr "Pourcent"
 
-#: wpu_polls.php:588
+#: wpu_polls.php:592
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:589
+#: wpu_polls.php:593
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:593
+#: wpu_polls.php:597
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:729
+#: wpu_polls.php:733
 msgid "Invalid poll"
 msgstr "Sondage invalide"
 
-#: wpu_polls.php:734 wpu_polls.php:1150
+#: wpu_polls.php:738 wpu_polls.php:1154
 msgid "Poll is closed"
 msgstr "Le sondage est fermé"
 
-#: wpu_polls.php:744
+#: wpu_polls.php:748
 msgid "Too much answers"
 msgstr "Trop de réponses"
 
-#: wpu_polls.php:753
+#: wpu_polls.php:757
 msgid "Not enough answers"
 msgstr "Pas assez de réponses"
 
-#: wpu_polls.php:772 wpu_polls.php:775
+#: wpu_polls.php:776 wpu_polls.php:779
 msgid "Form is invalid"
 msgstr "Le formulaire n’est pas valide"
 
-#: wpu_polls.php:785 wpu_polls.php:792 wpu_polls.php:807
+#: wpu_polls.php:789 wpu_polls.php:796 wpu_polls.php:811
 msgid "You have already sent a reply"
 msgstr "Vous avez déjà envoyé une réponse"
 
-#: wpu_polls.php:822
+#: wpu_polls.php:826
 msgid "Invalid answer"
 msgstr "Réponse non valide"
 
-#: wpu_polls.php:826
+#: wpu_polls.php:830
 msgid "Max number of answers has been reached"
 msgstr "Le nombre maximum de réponses a été atteint"
 
-#: wpu_polls.php:1113
+#: wpu_polls.php:1117
 #, php-format
 msgid "I agree to be contacted by phone or email by %s or its partners."
 msgstr ""
 "J’accepte d’être contacté par téléphone ou par email par %s ou ses "
 "partenaires."
 
-#: wpu_polls.php:1136
+#: wpu_polls.php:1140
 msgid "Thank you for your vote !"
 msgstr "Merci pour votre vote !"
 
-#: wpu_polls.php:1188
+#: wpu_polls.php:1192
 msgid "Available: "
 msgstr "Disponible: "
 

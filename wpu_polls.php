@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.22.0
+Version: 0.22.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.22.0';
+    private $plugin_version = '0.22.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -442,6 +442,10 @@ class WPUPolls {
         echo '<div class="wpu-poll-details-inner">';
         echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
 
+        if($this->is_poll_closed($post->ID)){
+            echo '<p class="wpu-polls-closed">🚨 ' . __('This poll is closed.', 'wpu_polls') . ' 🚨</p>';
+        }
+
         /* Answers */
         echo '<table class="widefat striped">';
         echo '<thead>';
@@ -614,9 +618,9 @@ class WPUPolls {
         if (!is_array($args)) {
             $args = array();
         }
-        if (!isset($args['image_size'])) {
-            $args['image_size'] = 'thumbnail';
-        }
+        $args = array_merge(array(
+            'image_size' => 'thumbnail'
+        ), $args);
         foreach ($answers as $k => $answer) {
             $answers[$k]['imagepreview'] = '';
             if ($answer['image']) {
@@ -1028,7 +1032,7 @@ class WPUPolls {
 
         $settings = $this->settings_obj->get_settings();
 
-        $results = $this->get_votes_for_poll($poll_id, 1);
+        $this->get_votes_for_poll($poll_id, 1);
 
         $id_prefix = 'answer__' . $poll_id . '__';
 
