@@ -50,14 +50,23 @@ document.addEventListener('DOMContentLoaded', function() {
         $wrapper.attr('data-max-answers-locked', (_checkedBoxes >= _maxNb) ? 1 : 0);
     });
 
-    jQuery('.wpu-poll-main__wrapper .wpu-poll-main__answers').on('change', 'input[type="checkbox"], input[type="checkbox"]', function() {
-        var $this = jQuery(this);
-        $this.closest('.wpu-poll-main__answer').attr('data-checked', $this.prop('checked') ? '1' : '0');
-    });
+
+    function update_checked_state($wrapper) {
+        $wrapper.find('.wpu-poll-main__answers input[type="checkbox"], .wpu-poll-main__answers input[type="radio"]').each(function() {
+            var $this = jQuery(this);
+            $this.closest('.wpu-poll-main__answer').attr('data-checked', $this.prop('checked') ? '1' : '0');
+        });
+    }
 
     jQuery('.wpu-poll-main__wrapper').each(function() {
         var $wrapper = jQuery(this),
             $details_area = $wrapper.find('.wpu-polls-require-details-area');
+
+        /* Set visual indicator for checked state */
+        update_checked_state($wrapper);
+        $wrapper.on('change', 'input[type="checkbox"], input[type="radio"]', function() {
+            update_checked_state($wrapper);
+        });
 
         // Check validity of detail fields
         if ($details_area.length) {
