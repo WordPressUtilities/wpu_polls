@@ -17,6 +17,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    /* Handle minmax answers */
+    jQuery('#wpubasefields_wpu_polls__nbanswers').on('change', function() {
+        var $this = jQuery(this),
+            $min = jQuery('#wpubasefields_wpu_polls__nbanswers_min');
+        if ($this.val() < $min.val()) {
+            $this.val($min.val());
+            alert(wpu_polls_settings_back.max_vote_invalid);
+        }
+    });
+    jQuery('#wpubasefields_wpu_polls__nbanswers_min').on('change', function() {
+        var $this = jQuery(this),
+            $max = jQuery('#wpubasefields_wpu_polls__nbanswers');
+        if ($this.val() > $max.val()) {
+            $this.val($max.val());
+            alert(wpu_polls_settings_back.min_vote_invalid);
+        }
+    });
+
     /* Hide metabox layout */
     jQuery('#wpu-polls-box-id').each(function() {
         jQuery(this).removeClass('postbox');

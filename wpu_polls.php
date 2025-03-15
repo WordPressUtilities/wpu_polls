@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.22.2
+Version: 0.22.3
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.22.2';
+    private $plugin_version = '0.22.3';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -299,6 +299,8 @@ class WPUPolls {
         /* Back Script */
         wp_register_script('wpu_polls_back_script', plugins_url('assets/back.js', __FILE__), array('jquery', 'jquery-ui-sortable'), $this->plugin_version, true);
         wp_localize_script('wpu_polls_back_script', 'wpu_polls_settings_back', array(
+            'min_vote_invalid' => __('You need to select less min answer than max answers.', 'wpu_polls'),
+            'max_vote_invalid' => __('You need to select more max answer than min answers.', 'wpu_polls'),
             'confirm_vote_deletion' => __('Do you really want to delete this vote ?', 'wpu_polls'),
             'error_need_content' => __('You can’t have only empty choices', 'wpu_polls'),
             'error_need_all_images' => __('Images should be on every choice, or none of them.', 'wpu_polls'),
