@@ -22,6 +22,7 @@
 }
 
 .wpu-polls-field-text input,
+.answer-line input.answer-extra,
 .answer-line input.answer-text {
     width: 100%;
 }

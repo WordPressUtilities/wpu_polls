@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.22.3
+Version: 0.23.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.22.3';
+    private $plugin_version = '0.23.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -32,6 +32,7 @@ class WPUPolls {
     public $settings;
     private $nb_max = 999999999999;
     private $settings_obj;
+    private $extra_fields = array();
 
     public function __construct() {
         add_action('plugins_loaded', array(&$this, 'load_admin_datas'));
@@ -40,6 +41,7 @@ class WPUPolls {
 
         # Post type
         add_action('init', array(&$this, 'register_post_type'));
+        add_action('init', array(&$this, 'load_hooks'));
         add_filter('manage_polls_posts_columns', array(&$this, 'manage_polls_posts_columns'));
         add_action('manage_polls_posts_custom_column', array(&$this, 'manage_polls_posts_custom_column'), 10, 2);
 
@@ -198,33 +200,34 @@ class WPUPolls {
                 'label' => __('Maximum number of votes per response :', 'wpu_polls'),
                 'data' => $select_values
             ),
-            'wpu_polls__requiredetails' => array(
-                'type' => 'checkbox',
-                'group' => 'wpu_polls__settings',
-                'label' => __('Require user name and email to vote (use account details if loggedin)', 'wpu_polls')
-            ),
             'wpu_polls__unique_ip' => array(
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__settings',
                 'label' => __('An IP can vote only once per poll.', 'wpu_polls'),
-                'help' => sprintf(__('Current IP: %s.', 'wpu_polls'), $this->basetoolbox->get_user_ip(false)),
-
+                'help' => sprintf(__('Current IP: %s.', 'wpu_polls'), $this->basetoolbox->get_user_ip(false))
+            ),
+            'wpu_polls__requiredetails' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__extra_infos',
+                'label' => __('Require user name and email to vote (use account details if loggedin)', 'wpu_polls')
             ),
             'wpu_polls__gdprcheckbox' => array(
                 'toggle-display' => array(
                     'wpu_polls__requiredetails' => 'checked'
                 ),
                 'type' => 'checkbox',
-                'group' => 'wpu_polls__settings',
+                'group' => 'wpu_polls__extra_infos',
                 'label' => __('Display a GDPR checkbox', 'wpu_polls')
             ),
             'wpu_polls__gdprcheckbox__text' => array(
                 'toggle-display' => array(
+                    'wpu_polls__requiredetails' => 'checked',
                     'wpu_polls__gdprcheckbox' => 'checked'
                 ),
-                'group' => 'wpu_polls__settings',
+                'group' => 'wpu_polls__extra_infos',
                 'label' => __('Custom GDPR message', 'wpu_polls')
             ),
+
             /* Success */
             'wpu_polls__displaymessage' => array(
                 'type' => 'checkbox',
@@ -243,6 +246,7 @@ class WPUPolls {
                 'group' => 'wpu_polls__success',
                 'label' => __('Sort results by number of votes', 'wpu_polls')
             ),
+
             /* Closed */
             'wpu_polls__poll_closed' => array(
                 'type' => 'checkbox',
@@ -267,6 +271,7 @@ class WPUPolls {
                 'group' => 'wpu_polls__closed',
                 'label' => __('Custom message for closed poll', 'wpu_polls')
             ),
+
             /* Poll */
             'wpu_polls__question' => array(
                 'group' => 'wpu_polls__poll',
@@ -277,6 +282,10 @@ class WPUPolls {
         $field_groups = array(
             'wpu_polls__settings' => array(
                 'label' => __('Settings', 'wpu_polls'),
+                'post_type' => 'polls'
+            ),
+            'wpu_polls__extra_infos' => array(
+                'label' => __('Extra infos', 'wpu_polls'),
                 'post_type' => 'polls'
             ),
             'wpu_polls__success' => array(
@@ -400,6 +409,20 @@ class WPUPolls {
         }
     }
 
+    function load_hooks() {
+        /* Extra fields */
+        $this->extra_fields = apply_filters('wpu_polls__extra_fields', array());
+        foreach ($this->extra_fields as $id => $field) {
+            if (!isset($field['label'])) {
+                $this->extra_fields[$id]['label'] = $id;
+            }
+            if (!isset($field['type'])) {
+                $this->extra_fields[$id]['type'] = 'text';
+            }
+        }
+
+    }
+
     /* ----------------------------------------------------------
       Edit & Save post
     ---------------------------------------------------------- */
@@ -444,7 +467,7 @@ class WPUPolls {
         echo '<div class="wpu-poll-details-inner">';
         echo '<h3>' . __('Poll', 'wpu_polls') . '</h3>';
 
-        if($this->is_poll_closed($post->ID)){
+        if ($this->is_poll_closed($post->ID)) {
             echo '<p class="wpu-polls-closed">🚨 ' . __('This poll is closed.', 'wpu_polls') . ' 🚨</p>';
         }
 
@@ -595,7 +618,17 @@ class WPUPolls {
         $template .= '<button type="button" class="remove-image">' . __('Remove this image', 'wpu_polls') . '</button>';
         $template .= '</div>';
         $template .= '</td>';
-        $template .= '<td><input class="answer-line__uniqid" name="wpu_polls_uniqid[]" type="hidden" value="##uniqid##" /><input class="answer-text" name="wpu_polls_answer[]" type="text" value="##answer##" /></td>';
+        $template .= '<td>';
+        $template .= '<input class="answer-line__uniqid" name="wpu_polls_uniqid[]" type="hidden" value="##uniqid##" />';
+
+        $label = apply_filters('wpu_polls__answer_label', __('Answer', 'wpu_polls'));
+        $input = '<input class="answer-text" name="wpu_polls_answer[]" type="text" value="##answer##" />';
+        $template .= empty($this->extra_fields) ? $input : '<p><label>' . $label . '</label><br />' . $input . '</p>';
+
+        foreach ($this->extra_fields as $id => $field) {
+            $template .= '<p><label>' . esc_html($field['label']) . '</label><br /><input class="answer-extra" name="wpu_polls_answer_extra_' . $id . '[]" type="text" value="##extra_' . $id . '##" /></p>';
+        }
+        $template .= '</td>';
         $template .= '<td style="width:1em;"><button class="delete-line" title="' . esc_attr(__('Delete this reply', 'wpu_polls')) . '">&times;</button></td>';
         $template .= '</tr>';
         if (!is_array($vars)) {
@@ -605,7 +638,15 @@ class WPUPolls {
             $vars['image'] = 0;
         }
         foreach ($vars as $key => $var) {
+            if (!is_string($var)) {
+                continue;
+            }
             $template = str_replace('##' . $key . '##', $var, $template);
+            $template = str_replace('##extra_' . $key . '##', $var, $template);
+        }
+
+        foreach ($this->extra_fields as $id => $field) {
+            $template = str_replace('##extra_' . $id . '##', '', $template);
         }
 
         return $template;
@@ -674,6 +715,9 @@ class WPUPolls {
             'wpu_polls_answer',
             'wpu_polls_answer_image'
         );
+        foreach ($this->extra_fields as $id => $field) {
+            $post_keys[] = 'wpu_polls_answer_extra_' . $id;
+        }
         if (empty($_POST)) {
             return;
         }
@@ -707,11 +751,17 @@ class WPUPolls {
                 $image = 0;
             }
 
-            $answers[] = array(
+            $answer = array(
                 'answer' => trim(esc_html($answer)),
                 'uniqid' => trim(esc_html($uniqid)),
                 'image' => $image
             );
+
+            foreach ($this->extra_fields as $id => $field) {
+                $answer['extra_' . $id] = trim(esc_html($_POST['wpu_polls_answer_extra_' . $id][$i]));
+            }
+
+            $answers[] = $answer;
         }
         update_post_meta($post_id, 'wpu_polls__answers', $answers);
         update_post_meta($post_id, 'wpu_polls__last_update', time());
@@ -819,8 +869,6 @@ class WPUPolls {
         foreach ($answers as $answer) {
             $accepted_answers[] = $answer['uniqid'];
         }
-
-
 
         foreach ($answers_ids as $answer_id) {
             /* Answer does not exists */
@@ -1193,6 +1241,14 @@ class WPUPolls {
         if ($nbvotesmax < 99) {
             $html_main .= '<span>(' . __('Available: ', 'wpu_polls') . '<span class="nbvotesmax_value">0</span>)</span>';
         }
+
+        foreach ($this->extra_fields as $id => $field) {
+            if (isset($answer['extra_' . $id]) && $answer['extra_' . $id]) {
+                $html_main .= '<div class="part-extra part-extra--' . $id . '">' . esc_html($answer['extra_' . $id]) . '</div>';
+            }
+
+        }
+
         $html_main .= '</div>';
         return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);
     }
@@ -1223,3 +1279,15 @@ class WPUPolls {
 }
 
 $WPUPolls = new WPUPolls();
+
+/* ----------------------------------------------------------
+  Helpers
+---------------------------------------------------------- */
+
+function wpu_polls_is_poll_closed($poll_id) {
+    global $WPUPolls;
+    if (!$WPUPolls || !is_object($WPUPolls)) {
+        return false;
+    }
+    return $WPUPolls->is_poll_closed($poll_id);
+}

@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var _uniqid = 't' + Math.random().toString(12).slice(2, 12) + Date.now();
         var _tpl_content_line = jQuery('#wpu-polls-answer-template').html().replace('##uniqid##', _uniqid);
         /* Remove template vars */
-        _tpl_content_line = _tpl_content_line.replace(/##[a-z]+##/g, '');
+        _tpl_content_line = _tpl_content_line.replace(/##[a-z_]+##/g, '');
         /* Insert line */
         var $new_line = jQuery(_tpl_content_line);
         $answers.append($new_line);

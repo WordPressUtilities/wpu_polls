@@ -254,18 +254,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (_sort_results == '1') {
-            $items.sort(function(a, b) {
-                var countA = parseInt(a.getAttribute('data-count'));
-                var countB = parseInt(b.getAttribute('data-count'));
-                return countB - countA;
-            });
-
-            $items.each(function(i, el) {
-                el.setAttribute('data-i', i + 1);
-                $list.append(jQuery(el));
+            $items.sort(wpu_poll_sort_by_count);
+        } else {
+            $items.sort(function() {
+                return 0.5 - Math.random();
             });
         }
 
+        $items.each(function(i, el) {
+            el.setAttribute('data-i', i + 1);
+            $list.append(jQuery(el));
+        });
+
+    }
+
+    function wpu_poll_sort_by_count(a, b) {
+        var countA = parseInt(a.getAttribute('data-count'));
+        var countB = parseInt(b.getAttribute('data-count'));
+        return countB - countA;
     }
 
     function wpu_poll_build_results_item($item, _nb_results, _percent) {
