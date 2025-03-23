@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.23.0
+Version: 0.24.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.23.0';
+    private $plugin_version = '0.24.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -114,6 +114,10 @@ class WPUPolls {
                 'gdpr' => array(
                     'public_name' => 'GDPR',
                     'type' => 'number'
+                ),
+                'comment' => array(
+                    'public_name' => 'Comment',
+                    'sql' => 'text'
                 )
             )
         ));
@@ -226,6 +230,11 @@ class WPUPolls {
                 ),
                 'group' => 'wpu_polls__extra_infos',
                 'label' => __('Custom GDPR message', 'wpu_polls')
+            ),
+            'wpu_polls__comment_field' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__extra_infos',
+                'label' => __('Display a comment field', 'wpu_polls')
             ),
 
             /* Success */
@@ -409,7 +418,7 @@ class WPUPolls {
         }
     }
 
-    function load_hooks() {
+    public function load_hooks() {
         /* Extra fields */
         $this->extra_fields = apply_filters('wpu_polls__extra_fields', array());
         foreach ($this->extra_fields as $id => $field) {
@@ -881,6 +890,13 @@ class WPUPolls {
             }
         }
 
+        $comment_field = get_post_meta($poll_id, 'wpu_polls__comment_field', 1);
+        if ($comment_field && isset($post['user_comment']) && !empty($post['user_comment'])) {
+            $post['comment'] = $post['user_comment'];
+        } else {
+            $comment_field = 0;
+        }
+
         /* Answer */
         foreach ($answers_ids as $answer_id) {
             $answer_data = array(
@@ -888,6 +904,9 @@ class WPUPolls {
                 'user_ip' => $user_ip,
                 'answer_id' => esc_html($answer_id)
             );
+            if ($comment_field) {
+                $answer_data['comment'] = esc_html($post['comment']);
+            }
             if ($requiredetails == '1') {
                 $answer_data['user_email'] = $post['user_email'];
                 $answer_data['user_id'] = $post['user_id'];
@@ -1068,6 +1087,7 @@ class WPUPolls {
         $is_closed = $this->is_poll_closed($poll_id);
         $displaymessage_closed = get_post_meta($poll_id, 'wpu_polls__poll_closed__displaymessage', 1);
         $gdprcheckbox = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox', 1);
+        $comment_field = get_post_meta($poll_id, 'wpu_polls__comment_field', 1);
         $sort_results = get_post_meta($poll_id, 'wpu_polls__sort_results', 1);
         $min_answers = $this->get_poll_nbanswers_min($poll_id);
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
@@ -1129,11 +1149,9 @@ class WPUPolls {
             'data-nb-votes-max' => $nbvotesmax,
             'data-has-voted' => $has_voted,
             'data-is-closed' => $is_closed ? '1' : '0',
-            'data-poll-id' => $poll_id
+            'data-poll-id' => $poll_id,
+            'data-nb-answers'=> $nbanswers
         );
-        if ($nbanswers > 1) {
-            $wrapper_attributes['data-nb-answers'] = $nbanswers;
-        }
 
         $html = '<div class="wpu-poll-main__wrapper" ' . $this->basetoolbox->array_to_html_attributes($wrapper_attributes) . '>';
 
@@ -1145,6 +1163,8 @@ class WPUPolls {
         $html .= '<ul data-has-image="' . ($has_answer_image ? '1' : '0') . '" class="wpu-poll-main__answers">';
         $html .= $html_main;
         $html .= '</ul>';
+
+        $html .= apply_filters('wpu_polls__vote_content__after_answers', '', $poll_id);
 
         if ($requiredetails == '1') {
             $user_name = '';
@@ -1179,7 +1199,19 @@ class WPUPolls {
             $html .= '</div>';
         }
 
+        if ($comment_field) {
+            $label_comment = apply_filters('wpu_polls__comment_label', __('Comment', 'wpu_polls'));
+            $html .= '<p>';
+            $html .= '<label for="' . $id_prefix . '_comment">' . $label_comment . '</label>';
+            $html .= '<textarea id="' . $id_prefix . '_comment" name="user_comment"></textarea>';
+            $html .= '</p>';
+        }
+
+        $html .= apply_filters('wpu_polls__vote_content__before_submit', '', $poll_id);
         $html .= '<p class="wpu-poll-main__submit"><button type="button"><span>' . __('Submit', 'wpu_polls') . '</span></button></p>';
+
+        $html .= apply_filters('wpu_polls__vote_content__after_submit', '', $poll_id);
+
         $html .= '</div>';
 
         /* Results */
@@ -1233,6 +1265,9 @@ class WPUPolls {
     public function get_vote_content__item_main($poll_id, $answer_id, $answer, $type = 'checkbox') {
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
         $html_main = '';
+
+        $html_main .= apply_filters('wpu_polls__get_vote_content__item_main__html_before_content', '', $answer_id, $answer);
+
         if ($answer['imagepreview']) {
             $html_main .= '<label class="part-image" for="' . $answer_id . '">' . $answer['imagepreview'] . '</label>';
         }
@@ -1248,6 +1283,8 @@ class WPUPolls {
             }
 
         }
+
+        $html_main .= apply_filters('wpu_polls__get_vote_content__item_main__html_after_content', '', $answer_id, $answer);
 
         $html_main .= '</div>';
         return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);

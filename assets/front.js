@@ -28,12 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 10000);
 
     /* Limit to checkboxes */
-    jQuery('.wpu-poll-main__wrapper[data-nb-answers] .wpu-poll-main__answers').on('change', 'input[type="checkbox"]', function() {
+    jQuery('.wpu-poll-main__wrapper[data-nb-answers] .wpu-poll-main__answers').on('change', 'input[type="checkbox"], input[type="radio"]', function() {
         var $this = jQuery(this),
             $wrapper = $this.closest('.wpu-poll-main__wrapper'),
             _minAnswers = parseInt($wrapper.attr('data-min-answers'), 10),
             _maxNb = parseInt($wrapper.attr('data-nb-answers'), 10);
-        var _checkedBoxes = $wrapper.find('.wpu-poll-main__answers input[type="checkbox"]:checked').length;
+        var _checkedBoxes = $wrapper.find('.wpu-poll-main__answers').find('input[type="checkbox"]:checked,input[type="radio"]:checked').length;
 
         /* Prevent selecting too many answers */
         if (_checkedBoxes > _maxNb) {
@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         /* Visual indicator */
         $wrapper.attr('data-max-answers-locked', (_checkedBoxes >= _maxNb) ? 1 : 0);
     });
+
 
 
     function update_checked_state($wrapper) {
@@ -115,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             $user_name = $main.find('[name="user_name"]'),
             $user_email = $main.find('[name="user_email"]'),
             $user_gdpr = $main.find('[name="user_gdpr"]'),
+            $user_comment = $main.find('[name="user_comment"]'),
             $answers = $main.find('.wpu-poll-main__answers'),
             _minAnswers = parseInt($main.attr('data-min-answers'), 10);
 
@@ -161,6 +163,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if ($user_gdpr) {
             _data.user_gdpr = $user_gdpr.val();
+        }
+        if ($user_comment) {
+            _data.user_comment = $user_comment.val();
         }
 
         /* Send action */
