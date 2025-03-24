@@ -33,7 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
             $wrapper = $this.closest('.wpu-poll-main__wrapper'),
             _minAnswers = parseInt($wrapper.attr('data-min-answers'), 10),
             _maxNb = parseInt($wrapper.attr('data-nb-answers'), 10);
-        var _checkedBoxes = $wrapper.find('.wpu-poll-main__answers').find('input[type="checkbox"]:checked,input[type="radio"]:checked').length;
+        var _checkedBoxes = $wrapper.find('.wpu-poll-main__answers').find('input[type="checkbox"]:checked,input[type="radio"]:checked').length,
+        _hasCheckboxes = $wrapper.find('.wpu-poll-main__answers').find('input[type="checkbox"]').length;
 
         /* Prevent selecting too many answers */
         if (_checkedBoxes > _maxNb) {
@@ -47,7 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         /* Visual indicator */
-        $wrapper.attr('data-max-answers-locked', (_checkedBoxes >= _maxNb) ? 1 : 0);
+        if (_hasCheckboxes){
+            $wrapper.attr('data-max-answers-locked', (_checkedBoxes >= _maxNb) ? 1 : 0);
+        }
     });
 
 

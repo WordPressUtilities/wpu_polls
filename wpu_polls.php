@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.24.0
+Version: 0.24.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.24.0';
+    private $plugin_version = '0.24.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -1201,14 +1201,17 @@ class WPUPolls {
 
         if ($comment_field) {
             $label_comment = apply_filters('wpu_polls__comment_label', __('Comment', 'wpu_polls'));
+            $html .= '<div class="wpu-polls-comment-area">';
             $html .= '<p>';
             $html .= '<label for="' . $id_prefix . '_comment">' . $label_comment . '</label>';
             $html .= '<textarea id="' . $id_prefix . '_comment" name="user_comment"></textarea>';
             $html .= '</p>';
+            $html .= '</div>';
         }
 
         $html .= apply_filters('wpu_polls__vote_content__before_submit', '', $poll_id);
-        $html .= '<p class="wpu-poll-main__submit"><button type="button"><span>' . __('Submit', 'wpu_polls') . '</span></button></p>';
+        $label_vote_btn = apply_filters('wpu_polls__label_vote_btn', __('Submit', 'wpu_polls'));
+        $html .= '<p class="wpu-poll-main__submit"><button type="button"><span>' . $label_vote_btn . '</span></button></p>';
 
         $html .= apply_filters('wpu_polls__vote_content__after_submit', '', $poll_id);
 
@@ -1227,7 +1230,7 @@ class WPUPolls {
                 $displaymessage__content = nl2br(trim(wp_strip_all_tags($displaymessage__content)));
                 $displaymessage__content = apply_filters('wpu_polls__displaymessage__content', $displaymessage__content, $poll_id);
                 $html .= '<div data-nosnippet class="wpu-poll-success-message">';
-                $html .= '<p>' . $displaymessage__content . '</p>';
+                $html .= wpautop($displaymessage__content);
                 $html .= '</div>';
             }
             if ($displaymessage_closed) {
