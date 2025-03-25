@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var _uniqid = 't' + Math.random().toString(12).slice(2, 12) + Date.now();
         var _tpl_content_line = jQuery('#wpu-polls-answer-template').html().replace('##uniqid##', _uniqid);
         /* Remove template vars */
+        _tpl_content_line = _tpl_content_line.replace(/##image##/g, '0');
         _tpl_content_line = _tpl_content_line.replace(/##[a-z_]+##/g, '');
         /* Insert line */
         var $new_line = jQuery(_tpl_content_line);
@@ -67,10 +68,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Add a line : press enter */
     $answers.on('keydown', function(e) {
-        if (e.keyCode == 13) {
-            e.preventDefault();
-            add_line();
+        if (e.keyCode != 13) {
+            return;
         }
+
+        if (!jQuery(e.target).closest('.answer-line').is(':last-child')) {
+            return;
+        }
+
+        e.preventDefault();
+        add_line();
     });
 
     /* Remove a line */

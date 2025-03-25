@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.24.1
+Version: 0.24.2
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.24.1';
+    private $plugin_version = '0.24.2';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -114,6 +114,9 @@ class WPUPolls {
                 'gdpr' => array(
                     'public_name' => 'GDPR',
                     'type' => 'number'
+                ),
+                'lang' => array(
+                    'public_name' => 'Lang'
                 ),
                 'comment' => array(
                     'public_name' => 'Comment',
@@ -393,7 +396,8 @@ class WPUPolls {
         foreach ($columns as $k => $col) {
             $new_columns[$k] = $col;
             if ($k == 'title') {
-                $new_columns['poll_question'] = 'Question';
+                $new_columns['poll_question'] = __('Question', 'wpu_polls');
+                $new_columns['poll_nbvotes'] = __('Number of votes', 'wpu_polls');
             }
         }
         return $new_columns;
@@ -402,6 +406,10 @@ class WPUPolls {
     public function manage_polls_posts_custom_column($column_key, $post_id) {
         if ($column_key == 'poll_question') {
             echo get_post_meta($post_id, 'wpu_polls__question', 1);
+        }
+        if ($column_key == 'poll_nbvotes') {
+            $votes = $this->get_votes_for_poll($post_id);
+            echo $votes['nb_votes'];
         }
     }
 
@@ -448,7 +456,11 @@ class WPUPolls {
             return;
         }
         if (isset($_GET['wpu_polls_export_csv']) && isset($_GET['post']) && is_numeric($_GET['post'])) {
+
+            /* Reload votes cache */
             $votes = $this->get_votes_for_poll($_GET['post']);
+
+            /* Export results as a CSV */
             $short_results = $this->get_results_for_poll($_GET['post']);
             $this->baseadmindatas->export_array_to_csv($short_results, 'polls-' . $_GET['post']);
         }
@@ -538,72 +550,10 @@ class WPUPolls {
 
         if (!empty($answers_display)) {
             if ($requiredetails) {
-
-                $short_results = $this->get_results_for_poll($post->ID);
-                echo '<h3>' . __('Votes', 'wpu_polls') . '</h3>';
-                if ($total_votes) {
-                    echo '<p>' . sprintf(__('Total number of votes: <b>%s</b>', 'wpu_polls'), $total_votes) . '</p>';
-                }
-                echo '<table class="widefat striped" id="wpu-polls-table-votes">';
-                echo '<thead>';
-                echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
-                echo '<th>' . __('Name', 'wpu_polls') . '</th>';
-                echo '<th>' . __('Email', 'wpu_polls') . '</th>';
-                echo '<th>' . __('User', 'wpu_polls') . '</th>';
-                echo '<th>' . __('GDPR', 'wpu_polls') . '</th>';
-                echo '<th></th>';
-                echo '</thead>';
-                foreach ($answers_display as $answer) {
-                    $html_answer = '';
-                    foreach ($short_results as $result) {
-                        if ($result['answer_id'] != $answer['uniqid']) {
-                            continue;
-                        }
-                        $delete_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_delete_vote=' . $result['id']);
-                        $user_id = '';
-                        if (is_numeric($result['user_id']) && $result['user_id']) {
-                            $user_id = '<a href="' . admin_url('user-edit.php?user_id=' . $result['user_id']) . '">' . sprintf(__('#%s', 'wpu_polls'), $result['user_id']) . '</a>';
-                        }
-                        $html_answer .= '<tr>';
-                        $html_answer .= '<td>' . $answer['answer'] . '</td>';
-                        $html_answer .= '<td>' . $result['user_name'] . '</td>';
-                        $html_answer .= '<td>' . $result['user_email'] . '</td>';
-                        $html_answer .= '<td>' . $user_id . '</td>';
-                        $html_answer .= '<td>' . ($result['gdpr'] ? '&checkmark;' : '') . '</td>';
-                        $html_answer .= '<td><button class="delete-vote-button" type="button" data-delete-button-url="' . esc_url($delete_url) . '">&times;</button></td>';
-                        $html_answer .= '</tr>';
-                    }
-                    if ($html_answer) {
-                        echo '<tbody>' . $html_answer . '</tbody>';
-                    }
-                }
-                echo '</table>';
-                $export_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_export_csv=1');
-                echo '<hr /><div><a href="' . $export_url . '">' . __('Export results', 'wpu_polls') . '</a></div>';
-
+                require_once __DIR__ . '/inc/tpl/admin-detailed-results.php';
             } else {
-                echo '<h3>' . __('Results', 'wpu_polls') . '</h3>';
-                if ($total_votes) {
-                    echo '<p>' . sprintf(__('Total number of results: <b>%s</b>', 'wpu_polls'), $total_votes) . '</p>';
-                }
-                echo '<table contenteditable class="widefat striped">';
-                echo '<thead>';
-                echo '<th>' . __('Answer', 'wpu_polls') . '</th>';
-                echo '<th>' . __('Votes', 'wpu_polls') . '</th>';
-                echo '<th>' . __('Percent', 'wpu_polls') . '</th>';
-                echo '</thead>';
-                echo '<tbody>';
-                foreach ($answers_display as $answer) {
-                    echo '<tr>';
-                    echo '<td>' . $answer['answer'] . '</td>';
-                    echo '<td>' . $answer['votes_str'] . '</td>';
-                    echo '<td>' . $answer['percent'] . '</td>';
-                    echo '</tr>';
-                }
-                echo '</tbody>';
-                echo '</table>';
+                require_once __DIR__ . '/inc/tpl/admin-summary-results.php';
             }
-
         }
 
         /* Hidden fields */
@@ -902,6 +852,7 @@ class WPUPolls {
             $answer_data = array(
                 'post_id' => $poll_id,
                 'user_ip' => $user_ip,
+                'lang' => get_locale(),
                 'answer_id' => esc_html($answer_id)
             );
             if ($comment_field) {
@@ -1150,7 +1101,7 @@ class WPUPolls {
             'data-has-voted' => $has_voted,
             'data-is-closed' => $is_closed ? '1' : '0',
             'data-poll-id' => $poll_id,
-            'data-nb-answers'=> $nbanswers
+            'data-nb-answers' => $nbanswers
         );
 
         $html = '<div class="wpu-poll-main__wrapper" ' . $this->basetoolbox->array_to_html_attributes($wrapper_attributes) . '>';
