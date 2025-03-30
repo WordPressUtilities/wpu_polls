@@ -2,6 +2,10 @@
 defined('ABSPATH') || die;
 $short_results = $this->get_results_for_poll($post->ID);
 echo '<h3>' . __('Votes', 'wpu_polls') . '</h3>';
+$has_too_much_votes = (count($short_results) > 10);
+if($has_too_much_votes){
+    echo '<details class="wpu-polls-results-details">';
+}
 if ($total_votes) {
     echo '<p>' . sprintf(__('Total number of votes: <b>%s</b>', 'wpu_polls'), $total_votes) . '</p>';
 }
@@ -41,5 +45,10 @@ foreach ($answers_display as $answer) {
     }
 }
 echo '</table>';
+
+if ($has_too_much_votes) {
+    echo '</details>';
+}
+
 $export_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_export_csv=1');
 echo '<hr /><div><a href="' . $export_url . '">' . __('Export results', 'wpu_polls') . '</a></div>';

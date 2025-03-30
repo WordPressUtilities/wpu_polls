@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.24.2
+Version: 0.24.3
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.24.2';
+    private $plugin_version = '0.24.3';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -509,6 +509,12 @@ class WPUPolls {
         /* New line */
         echo '<p style="text-align:right"><button class="button button-primary button-large" type="button" id="wpu-polls-answer-add-line">' . __('Add an answer', 'wpu_polls') . '</button></p>';
 
+        /* Results */
+        $requiredetails = get_post_meta($post->ID, 'wpu_polls__requiredetails', 1);
+        $nbvotesmax = $this->get_poll_nbvotesmax($post->ID);
+
+        $is_register_mode = ($nbvotesmax != $this->nb_max && $requiredetails);
+
         $answers = $this->get_post_answers(get_the_ID());
         $results = $this->get_votes_for_poll(get_the_ID());
         $answers_display = array();
@@ -534,25 +540,23 @@ class WPUPolls {
                     'answer' => $answer['answer'],
                     'votes' => $nb_votes,
                     'votes_str' => $nb_votes_str,
-                    'percent' => ($nb_votes / $results['nb_votes'] * 100) . '%.'
+                    'percent' => number_format($nb_votes / $results['nb_votes'] * 100, 3) . '%'
                 );
-
             }
         }
 
-        $requiredetails = get_post_meta($post->ID, 'wpu_polls__requiredetails', 1);
-
-        if (!$requiredetails) {
+        if (!$is_register_mode) {
             usort($answers_display, function ($a, $b) {
                 return $b['votes'] - $a['votes'];
             });
         }
 
         if (!empty($answers_display)) {
+            if (!$is_register_mode) {
+                require_once __DIR__ . '/inc/tpl/admin-summary-results.php';
+            }
             if ($requiredetails) {
                 require_once __DIR__ . '/inc/tpl/admin-detailed-results.php';
-            } else {
-                require_once __DIR__ . '/inc/tpl/admin-summary-results.php';
             }
         }
 
