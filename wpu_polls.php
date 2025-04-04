@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.24.3
+Version: 0.25.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.24.3';
+    private $plugin_version = '0.25.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -919,6 +919,17 @@ class WPUPolls {
         if (!$last_update_time) {
             $last_update_time = time();
             update_post_meta($poll_id, 'wpu_polls__last_update', $last_update_time);
+        }
+
+        /* Do not send results if they should not be displayed */
+        $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
+        if (!$nbvotesmax) {
+            $displaymessage = get_post_meta($poll_id, 'wpu_polls__displaymessage', 1);
+            $displaymessage_closed = get_post_meta($poll_id, 'wpu_polls__poll_closed__displaymessage', 1);
+            $is_closed = $this->is_poll_closed($poll_id);
+            if (($displaymessage && !$is_closed) || ($displaymessage_closed && $is_closed)) {
+                $new_results = array();
+            }
         }
 
         $data = array(
