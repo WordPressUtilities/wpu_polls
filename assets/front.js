@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             _minAnswers = parseInt($wrapper.attr('data-min-answers'), 10),
             _maxNb = parseInt($wrapper.attr('data-nb-answers'), 10);
         var _checkedBoxes = $wrapper.find('.wpu-poll-main__answers').find('input[type="checkbox"]:checked,input[type="radio"]:checked').length,
-        _hasCheckboxes = $wrapper.find('.wpu-poll-main__answers').find('input[type="checkbox"]').length;
+            _hasCheckboxes = $wrapper.find('.wpu-poll-main__answers').find('input[type="checkbox"]').length;
 
         /* Prevent selecting too many answers */
         if (_checkedBoxes > _maxNb) {
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         /* Visual indicator */
-        if (_hasCheckboxes){
+        if (_hasCheckboxes) {
             $wrapper.attr('data-max-answers-locked', (_checkedBoxes >= _maxNb) ? 1 : 0);
         }
     });
@@ -108,6 +108,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     });
 
+    function check_required_details($container) {
+        var $fields = $container.find('input, textarea, select');
+
+        var isFormValid = true;
+
+        $fields.each(function() {
+            var $field = jQuery(this);
+            var field = $field.get(0);
+
+            /* Check if field is required and empty */
+            if ($field.attr('required') && !$field.val().trim()) {
+                isFormValid = false;
+            }
+
+            /* Check validity using the browser's validation API */
+            if (field && typeof field.checkValidity === 'function' && !field.checkValidity()) {
+                isFormValid = false;
+            }
+        });
+
+        $container.attr('data-form-valid', isFormValid ? '1' : '0');
+        return isFormValid;
+    }
+
+    jQuery('.wpu-poll-main__wrapper').each(function(i, $el) {
+        /* Initial check */
+        check_required_details(jQuery($el));
+
+        /* Watch */
+        jQuery($el).on('change', 'input, textarea, select', function() {
+            check_required_details(jQuery($el));
+        });
+    });
+
     /* Vote */
     jQuery('.wpu-poll-main__submit button').on('click', function(e) {
         e.preventDefault();
@@ -141,11 +175,8 @@ document.addEventListener('DOMContentLoaded', function() {
             _values.push(jQuery(this).val());
         });
 
-        var _hasRequiredDetails = $main.attr('data-has-required-details');
-        if (_hasRequiredDetails == '1') {
-            if (!$user_name || !$user_email || !$user_name.val() || !$user_email.val()) {
-                return false;
-            }
+        if ($main.attr('data-has-required-details') == '1' && !check_required_details($main)) {
+            return false;
         }
 
         /* Loader */

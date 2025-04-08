@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.25.0
+Version: 0.26.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.25.0';
+    private $plugin_version = '0.26.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -458,11 +458,35 @@ class WPUPolls {
         if (isset($_GET['wpu_polls_export_csv']) && isset($_GET['post']) && is_numeric($_GET['post'])) {
 
             /* Reload votes cache */
-            $votes = $this->get_votes_for_poll($_GET['post']);
+            $this->get_votes_for_poll($_GET['post']);
 
             /* Export results as a CSV */
             $short_results = $this->get_results_for_poll($_GET['post']);
-            $this->baseadmindatas->export_array_to_csv($short_results, 'polls-' . $_GET['post']);
+
+            $short_results = array_map(function ($result) {
+
+                $fields_to_clean = array(
+                    'user_name',
+                    'comment',
+                    'answer_name'
+                );
+
+                foreach ($fields_to_clean as $f) {
+                    if (!isset($result[$f])) {
+                        continue;
+                    }
+                    if (!$result[$f]) {
+                        continue;
+                    }
+                    $result[$f] = $this->basetoolbox->clean_content_for_csv($result[$f]);
+                }
+
+                return $result;
+            }, $short_results);
+            $short_results = apply_filters('wpu_polls__export_csv__short_results', $short_results, $_GET['post']);
+            $this->basetoolbox->export_array_to_csv($short_results, 'polls-' . $_GET['post'], array(
+                'separator' => ';'
+            ));
         }
         if (isset($_GET['wpu_polls_delete_vote']) && isset($_GET['post']) && is_numeric($_GET['post']) && is_numeric($_GET['wpu_polls_delete_vote'])) {
             global $wpdb;
@@ -1111,6 +1135,7 @@ class WPUPolls {
             'data-has-required-details' => $requiredetails ? '1' : '0',
             'data-min-answers' => $min_answers,
             'data-min-answers-locked' => '1',
+            'data-form-valid' => '1',
             'data-sort-results' => $sort_results ? '1' : '0',
             'data-nb-votes-max' => $nbvotesmax,
             'data-has-voted' => $has_voted,
