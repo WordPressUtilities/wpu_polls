@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2025-03-25 12:01+0100\n"
+"POT-Creation-Date: 2025-04-10 23:01+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,7 +12,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_x;_e\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.6\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: inc/WPUBaseAdminDatas\n"
 "X-Poedit-SearchPathExcluded-1: inc/WPUBaseSettings\n"
@@ -45,7 +45,7 @@ msgstr "Retirer l’image"
 msgid "This field is invalid"
 msgstr "Ce champ est invalide"
 
-#: inc/WPUBaseToolbox/WPUBaseToolbox.php:169 wpu_polls.php:1160
+#: inc/WPUBaseToolbox/WPUBaseToolbox.php:169 wpu_polls.php:1204
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -75,7 +75,7 @@ msgstr "Le champ « %s » est obligatoire"
 msgid "The field “%s” should be an email"
 msgstr "Le champ « %s » doit être un email"
 
-#: inc/WPUBaseToolbox/WPUBaseToolbox.php:658
+#: inc/WPUBaseToolbox/WPUBaseToolbox.php:674
 #, php-format
 msgid ""
 "The plugin <b>%s</b> depends on the following plugins. Please install and "
@@ -84,7 +84,7 @@ msgstr ""
 "Le plugin <b>%s</b> dépend des plugins suivants. Veuillez les installer et "
 "les activer :"
 
-#: inc/WPUBaseToolbox/WPUBaseToolbox.php:664
+#: inc/WPUBaseToolbox/WPUBaseToolbox.php:680
 #, php-format
 msgid ""
 "The plugin <b>%s</b> depends on the <b>%s</b> plugin. Please install and "
@@ -93,60 +93,66 @@ msgstr ""
 "Le plugin <b>%s</b> dépend du plugin <b>%s</b>. Merci de l’installer et de "
 "l’activer."
 
-#: inc/tpl/admin-detailed-results.php:3 inc/tpl/admin-summary-results.php:9
-#: wpu_polls.php:1004
+#: inc/tpl/admin-detailed-results.php:4 inc/tpl/admin-summary-results.php:10
+#: wpu_polls.php:1047
 msgid "Votes"
 msgstr "Votes"
 
-#: inc/tpl/admin-detailed-results.php:5
+#: inc/tpl/admin-detailed-results.php:11
+#, php-format
+msgid "Please <a href=\"%s\">click here</a> to load the detailed votes."
+msgstr ""
+"Vous pouvez <a href=\"%s\">cliquer ici</a> pour voir le détail des votes."
+
+#: inc/tpl/admin-detailed-results.php:17
 #, php-format
 msgid "Total number of votes: <b>%s</b>"
 msgstr "Nombre total de votes: <b>%s</b>"
 
-#: inc/tpl/admin-detailed-results.php:9 inc/tpl/admin-summary-results.php:8
-#: wpu_polls.php:496 wpu_polls.php:579
+#: inc/tpl/admin-detailed-results.php:21 inc/tpl/admin-summary-results.php:9
+#: wpu_polls.php:524 wpu_polls.php:611
 msgid "Answer"
 msgstr "Réponse"
 
-#: inc/tpl/admin-detailed-results.php:10 wpu_polls.php:1129
+#: inc/tpl/admin-detailed-results.php:22 wpu_polls.php:1173
 msgid "Name"
 msgstr "Nom"
 
-#: inc/tpl/admin-detailed-results.php:11 wpu_polls.php:1130
+#: inc/tpl/admin-detailed-results.php:23 wpu_polls.php:1174
 msgid "Email"
 msgstr "E-mail"
 
-#: inc/tpl/admin-detailed-results.php:12
+#: inc/tpl/admin-detailed-results.php:24
 msgid "User"
 msgstr "Utilisateur"
 
-#: inc/tpl/admin-detailed-results.php:13
+#: inc/tpl/admin-detailed-results.php:25
 msgid "GDPR"
 msgstr "RGPD"
 
-#: inc/tpl/admin-detailed-results.php:14
+#: inc/tpl/admin-detailed-results.php:26
 msgid "Language"
 msgstr "Langue"
 
-#: inc/tpl/admin-detailed-results.php:26
+#: inc/tpl/admin-detailed-results.php:38
 #, php-format
 msgid "#%s"
 msgstr "#%s"
 
-#: inc/tpl/admin-detailed-results.php:44
+#: inc/tpl/admin-detailed-results.php:58
 msgid "Export results"
 msgstr "Exporter les résultats"
 
-#: inc/tpl/admin-summary-results.php:2
+#: inc/tpl/admin-summary-results.php:3
 msgid "Results"
 msgstr "Résultats"
 
-#: inc/tpl/admin-summary-results.php:4
+#: inc/tpl/admin-summary-results.php:5
 #, php-format
 msgid "Total number of results: <b>%s</b>"
 msgstr "Nombre total de résultats: <b>%s</b>"
 
-#: inc/tpl/admin-summary-results.php:10
+#: inc/tpl/admin-summary-results.php:11
 msgid "Percent"
 msgstr "Pourcent"
 
@@ -266,7 +272,7 @@ msgstr "Message de réussite et résultats"
 msgid "Closed poll settings"
 msgstr "Paramètres de fermeture du sondage"
 
-#: wpu_polls.php:312 wpu_polls.php:356 wpu_polls.php:358 wpu_polls.php:485
+#: wpu_polls.php:312 wpu_polls.php:356 wpu_polls.php:358 wpu_polls.php:513
 msgid "Poll"
 msgstr "Sondage"
 
@@ -301,15 +307,15 @@ msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:342 wpu_polls.php:517
+#: wpu_polls.php:342 wpu_polls.php:551
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:343 wpu_polls.php:519
+#: wpu_polls.php:343 wpu_polls.php:553
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:344 wpu_polls.php:525
+#: wpu_polls.php:344 wpu_polls.php:559
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
@@ -386,84 +392,90 @@ msgstr "Liste des sondages"
 msgid "Number of votes"
 msgstr "Nombre de votes"
 
-#: wpu_polls.php:472
+#: wpu_polls.php:500
 msgid "The vote has been successfully deleted."
 msgstr "Le vote a été supprimé avec succès."
 
-#: wpu_polls.php:488
+#: wpu_polls.php:516
 msgid "This poll is closed."
 msgstr "Ce sondage est fermé."
 
-#: wpu_polls.php:495
+#: wpu_polls.php:523
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:506
+#: wpu_polls.php:534
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:572
+#: wpu_polls.php:604
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:573
+#: wpu_polls.php:605
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:587
+#: wpu_polls.php:619
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:740
+#: wpu_polls.php:772
 msgid "Invalid poll"
 msgstr "Sondage invalide"
 
-#: wpu_polls.php:745 wpu_polls.php:1186
+#: wpu_polls.php:777 wpu_polls.php:1230
 msgid "Poll is closed"
 msgstr "Le sondage est fermé"
 
-#: wpu_polls.php:755
+#: wpu_polls.php:787
 msgid "Too much answers"
 msgstr "Trop de réponses"
 
-#: wpu_polls.php:764
+#: wpu_polls.php:796
 msgid "Not enough answers"
 msgstr "Pas assez de réponses"
 
-#: wpu_polls.php:783 wpu_polls.php:786
+#: wpu_polls.php:815 wpu_polls.php:818
 msgid "Form is invalid"
 msgstr "Le formulaire n’est pas valide"
 
-#: wpu_polls.php:796 wpu_polls.php:803 wpu_polls.php:818
+#: wpu_polls.php:828 wpu_polls.php:835 wpu_polls.php:850
 msgid "You have already sent a reply"
 msgstr "Vous avez déjà envoyé une réponse"
 
-#: wpu_polls.php:831
+#: wpu_polls.php:863
 msgid "Invalid answer"
 msgstr "Réponse non valide"
 
-#: wpu_polls.php:835
+#: wpu_polls.php:867
 msgid "Max number of answers has been reached"
 msgstr "Le nombre maximum de réponses a été atteint"
 
-#: wpu_polls.php:1134
+#: wpu_polls.php:1178
 #, php-format
 msgid "I agree to be contacted by phone or email by %s or its partners."
 msgstr ""
 "J’accepte d’être contacté par téléphone ou par email par %s ou ses "
 "partenaires."
 
-#: wpu_polls.php:1150
+#: wpu_polls.php:1194
 msgid "Comment"
 msgstr "Commentaire"
 
-#: wpu_polls.php:1172
+#: wpu_polls.php:1216
 msgid "Thank you for your vote !"
 msgstr "Merci pour votre vote !"
 
-#: wpu_polls.php:1227
+#: wpu_polls.php:1271
 msgid "Available: "
 msgstr "Disponible: "
+
+#~ msgid "There are too many votes to display."
+#~ msgstr "Il y a trop de votes pour les afficher."
+
+#~ msgid "here"
+#~ msgstr "ici"
 
 #, php-format
 #~ msgid "Close this poll on : (current date: %s)"

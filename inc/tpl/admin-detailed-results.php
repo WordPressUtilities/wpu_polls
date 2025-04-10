@@ -1,11 +1,20 @@
 <?php
 defined('ABSPATH') || die;
 $short_results = $this->get_results_for_poll($post->ID);
+$has_too_much_votes = (count($short_results) > 100);
+$wpu_polls_load_results = isset($_GET['wpu_polls_load_results']) ? (int) $_GET['wpu_polls_load_results'] : 0;
+$export_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_export_csv=1');
+$export_html_str = '<hr /><div><a href="' . $export_url . '">' . __('Export results', 'wpu_polls') . '</a></div>';
+
 echo '<h3>' . __('Votes', 'wpu_polls') . '</h3>';
-$has_too_much_votes = (count($short_results) > 10);
-if($has_too_much_votes){
-    echo '<details class="wpu-polls-results-details">';
+if ($has_too_much_votes && !$wpu_polls_load_results) {
+    $edit_post_link = add_query_arg('wpu_polls_load_results', 1, get_edit_post_link($post->ID)) . '#wpu-polls-results-details';
+    echo wpautop(sprintf(__('Please <a href="%s">click here</a> to load the detailed votes.', 'wpu_polls'), $edit_post_link));
+    echo $export_html_str;
+    return;
 }
+
+echo '<details ' . ($wpu_polls_load_results ? 'open' : '') . ' id="wpu-polls-results-details" class="wpu-polls-results-details">';
 if ($total_votes) {
     echo '<p>' . sprintf(__('Total number of votes: <b>%s</b>', 'wpu_polls'), $total_votes) . '</p>';
 }
@@ -45,10 +54,5 @@ foreach ($answers_display as $answer) {
     }
 }
 echo '</table>';
-
-if ($has_too_much_votes) {
-    echo '</details>';
-}
-
-$export_url = admin_url('post.php?post=' . get_the_ID() . '&action=edit&wpu_polls_export_csv=1');
-echo '<hr /><div><a href="' . $export_url . '">' . __('Export results', 'wpu_polls') . '</a></div>';
+echo '</details>';
+echo $export_html_str;
