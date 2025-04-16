@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.26.1
+Version: 0.26.2
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.26.1';
+    private $plugin_version = '0.26.2';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -455,7 +455,16 @@ class WPUPolls {
         if ($screen->base != 'post' || $screen->post_type != 'polls') {
             return;
         }
-        if (isset($_GET['wpu_polls_export_csv']) && isset($_GET['post']) && is_numeric($_GET['post'])) {
+
+        if (!isset($_GET['post']) || !is_numeric($_GET['post'])) {
+            return;
+        }
+
+        if (!current_user_can('edit_post', $_GET['post'])) {
+            return;
+        }
+
+        if (isset($_GET['wpu_polls_export_csv'])) {
 
             /* Reload votes cache */
             $this->get_votes_for_poll($_GET['post']);
@@ -488,7 +497,7 @@ class WPUPolls {
                 'separator' => ';'
             ));
         }
-        if (isset($_GET['wpu_polls_delete_vote']) && isset($_GET['post']) && is_numeric($_GET['post']) && is_numeric($_GET['wpu_polls_delete_vote'])) {
+        if (isset($_GET['wpu_polls_delete_vote']) && is_numeric($_GET['wpu_polls_delete_vote'])) {
             global $wpdb;
             $wpdb->delete($this->baseadmindatas->tablename,
                 array(
