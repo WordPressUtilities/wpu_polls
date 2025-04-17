@@ -28,6 +28,11 @@ echo '<th>' . __('GDPR', 'wpu_polls') . '</th>';
 echo '<th>' . __('Language', 'wpu_polls') . '</th>';
 echo '<th></th>';
 echo '</thead>';
+
+/** Add a nonce field for security */
+echo '<input type="hidden" name="wpu_polls_nonce" value="' . esc_attr(wp_create_nonce('wpu_polls_nonce_action')) . '" />';
+
+
 foreach ($answers_display as $answer) {
     $html_answer = '';
     foreach ($short_results as $result) {

@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.26.2
+Version: 0.26.3
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.26.2';
+    private $plugin_version = '0.26.3';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -497,7 +497,7 @@ class WPUPolls {
                 'separator' => ';'
             ));
         }
-        if (isset($_GET['wpu_polls_delete_vote']) && is_numeric($_GET['wpu_polls_delete_vote'])) {
+        if (isset($_GET['wpu_polls_delete_vote'], $_GET['wpu_polls_nonce']) && is_numeric($_GET['wpu_polls_delete_vote']) && wp_verify_nonce($_GET['wpu_polls_nonce'], 'wpu_polls_nonce_action')) {
             global $wpdb;
             $wpdb->delete($this->baseadmindatas->tablename,
                 array(

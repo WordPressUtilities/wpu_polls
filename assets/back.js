@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         var $btn = jQuery(this);
         if (confirm(wpu_polls_settings_back.confirm_vote_deletion)) {
-            window.location.href = $btn.attr('data-delete-button-url');
+            window.location.href = $btn.attr('data-delete-button-url') + '&wpu_polls_nonce=' + jQuery('[name="wpu_polls_nonce"]').val();
         }
     });
 
