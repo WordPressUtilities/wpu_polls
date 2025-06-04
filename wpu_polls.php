@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.26.3
+Version: 0.27.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.26.3';
+    private $plugin_version = '0.27.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -257,6 +257,24 @@ class WPUPolls {
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__success',
                 'label' => __('Sort results by number of votes', 'wpu_polls')
+            ),
+            'wpu_polls__limit_results' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__success',
+                'label' => __('Display only the top results', 'wpu_polls')
+            ),
+            'wpu_polls__limit_results__number' => array(
+                'toggle-display' => array(
+                    'wpu_polls__limit_results' => 'checked'
+                ),
+                'group' => 'wpu_polls__success',
+                'label' => __('Number of results to display', 'wpu_polls'),
+                'type' => 'number'
+            ),
+            'wpu_polls__hide_stats_results' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__success',
+                'label' => __('Hide the stats results', 'wpu_polls')
             ),
 
             /* Closed */
@@ -1088,6 +1106,15 @@ class WPUPolls {
         $gdprcheckbox = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox', 1);
         $comment_field = get_post_meta($poll_id, 'wpu_polls__comment_field', 1);
         $sort_results = get_post_meta($poll_id, 'wpu_polls__sort_results', 1);
+        $limit_results = get_post_meta($poll_id, 'wpu_polls__limit_results', 1);
+        $limit_results__number = $this->nb_max;
+        if ($limit_results) {
+            $limit_results__number_value = get_post_meta($poll_id, 'wpu_polls__limit_results__number', 1);
+            if (is_numeric($limit_results__number_value) && $limit_results__number_value > 0) {
+                $limit_results__number = intval($limit_results__number_value, 10);
+            }
+        }
+        $hide_stats_results = get_post_meta($poll_id, 'wpu_polls__hide_stats_results', 1);
         $min_answers = $this->get_poll_nbanswers_min($poll_id);
         $nbvotesmax = $this->get_poll_nbvotesmax($poll_id);
 
@@ -1122,9 +1149,13 @@ class WPUPolls {
             $html_main .= '</li>';
 
             /* Results */
-            $html_results .= '<li data-i="' . ($i + 1) . '" class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
-            $html_results .= $this->get_vote_content__item_results($answer_id, $answer);
-            $html_results .= '</li>';
+            if ($i < $limit_results__number) {
+                $html_results .= '<li data-i="' . ($i + 1) . '" class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
+                $html_results .= $this->get_vote_content__item_results($answer_id, $answer, array(
+                    'hide_stats_results' => $hide_stats_results
+                ));
+                $html_results .= '</li>';
+            }
         }
 
         $has_voted = 0;
@@ -1284,7 +1315,6 @@ class WPUPolls {
             if (isset($answer['extra_' . $id]) && $answer['extra_' . $id]) {
                 $html_main .= '<div class="part-extra part-extra--' . $id . '">' . esc_html($answer['extra_' . $id]) . '</div>';
             }
-
         }
 
         $html_main .= apply_filters('wpu_polls__get_vote_content__item_main__html_after_content', '', $answer_id, $answer);
@@ -1293,14 +1323,38 @@ class WPUPolls {
         return apply_filters('wpu_polls__get_vote_content__item_main__html', $html_main, $answer_id, $answer);
     }
 
-    public function get_vote_content__item_results($answer_id, $answer) {
-        $html_results = $answer['imagepreview'];
+    public function get_vote_content__item_results($answer_id, $answer, $args = array()) {
+        if (!is_array($args)) {
+            $args = array();
+        }
+        $args = array_merge(array(
+            'hide_stats_results' => false
+        ), $args);
+
+        $html_results = '<div class="wpu-poll-results__answer-inner">';
+        if ($answer['imagepreview']) {
+            $html_results .= '<div class="answer__image">' . $answer['imagepreview'] . '</div>';
+        }
         $html_results .= '<div class="answer__inner">';
-        $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span><span class="count"></span><span class="percent"></span></span>';
-        $html_results .= '<span class="part-background"><span class="background"></span><span class="bar-count"></span></span>';
+
+        /* Results */
+        $html_results .= '<span class="part-answer"><span class="answer-text">' . $answer['answer'] . '</span>';
+        if (!$args['hide_stats_results']) {
+            $html_results .= '<span class="count"></span><span class="percent"></span>';
+        }
+        $html_results .= '</span>';
+        if (!$args['hide_stats_results']) {
+            $html_results .= '<span class="part-background"><span class="background"></span><span class="bar-count"></span></span>';
+        }
+        foreach ($this->extra_fields as $id => $field) {
+            if (isset($answer['extra_' . $id]) && $answer['extra_' . $id]) {
+                $html_results .= '<div class="part-extra part-extra--' . $id . '">' . esc_html($answer['extra_' . $id]) . '</div>';
+            }
+        }
+        $html_results .= '</div>';
         $html_results .= '</div>';
 
-        return apply_filters('wpu_polls__get_vote_content__item_results__html', $html_results, $answer_id, $answer);
+        return apply_filters('wpu_polls__get_vote_content__item_results__html', $html_results, $answer_id, $answer, $args, $this);
     }
 
     public function is_poll_closed($poll_id) {
