@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPU Polls\n"
-"POT-Creation-Date: 2025-06-04 19:42+0200\n"
+"POT-Creation-Date: 2025-06-06 21:58+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -45,7 +45,7 @@ msgstr "Retirer l’image"
 msgid "This field is invalid"
 msgstr "Ce champ est invalide"
 
-#: inc/WPUBaseToolbox/WPUBaseToolbox.php:169 wpu_polls.php:1244
+#: inc/WPUBaseToolbox/WPUBaseToolbox.php:169 wpu_polls.php:1247
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -98,7 +98,7 @@ msgid "Export results"
 msgstr "Exporter les résultats"
 
 #: inc/tpl/admin-detailed-results.php:9 inc/tpl/admin-summary-results.php:10
-#: wpu_polls.php:1074
+#: wpu_polls.php:1077
 msgid "Votes"
 msgstr "Votes"
 
@@ -114,15 +114,15 @@ msgid "Total number of votes: <b>%s</b>"
 msgstr "Nombre total de votes: <b>%s</b>"
 
 #: inc/tpl/admin-detailed-results.php:23 inc/tpl/admin-summary-results.php:9
-#: wpu_polls.php:551 wpu_polls.php:638
+#: wpu_polls.php:554 wpu_polls.php:641
 msgid "Answer"
 msgstr "Réponse"
 
-#: inc/tpl/admin-detailed-results.php:24 wpu_polls.php:1213
+#: inc/tpl/admin-detailed-results.php:24 wpu_polls.php:1216
 msgid "Name"
 msgstr "Nom"
 
-#: inc/tpl/admin-detailed-results.php:25 wpu_polls.php:1214
+#: inc/tpl/admin-detailed-results.php:25 wpu_polls.php:1217
 msgid "Email"
 msgstr "E-mail"
 
@@ -160,7 +160,7 @@ msgstr "Pourcent"
 msgid "WPU Polls handle simple polls"
 msgstr "WPU Polls gère des sondages simples"
 
-#: wpu_polls.php:147 wpu_polls.php:314
+#: wpu_polls.php:147 wpu_polls.php:317
 msgid "Settings"
 msgstr "Réglages"
 
@@ -219,267 +219,271 @@ msgstr "Afficher une case à cocher RGPD"
 msgid "Custom GDPR message"
 msgstr "Message RGPD personnalisé"
 
-#: wpu_polls.php:240
+#: wpu_polls.php:236 wpu_polls.php:256 wpu_polls.php:305
+msgid "This value is overriden by a filter in the source code."
+msgstr "Cette valeur est modifiée par un filtre dans le code source."
+
+#: wpu_polls.php:241
 msgid "Display a comment field"
 msgstr "Afficher un champ de commentaire"
 
-#: wpu_polls.php:247
+#: wpu_polls.php:248
 msgid "Display a message after vote instead of the results"
 msgstr "Afficher un message après le vote au lieu des résultats"
 
-#: wpu_polls.php:254
+#: wpu_polls.php:255
 msgid "Custom text message after vote"
 msgstr "Message texte personnalisé après le vote"
 
-#: wpu_polls.php:259
+#: wpu_polls.php:261
 msgid "Sort results by number of votes"
 msgstr "Trier les résultats par nombre de votes"
 
-#: wpu_polls.php:264
+#: wpu_polls.php:266
 msgid "Display only the top results"
 msgstr "Afficher seulement le top résultats"
 
-#: wpu_polls.php:271
+#: wpu_polls.php:273
 msgid "Number of results to display"
 msgstr "Nombre de résultats à afficher"
 
-#: wpu_polls.php:277
+#: wpu_polls.php:279
 msgid "Hide the stats results"
 msgstr "Masquer les statistiques des résultats"
 
-#: wpu_polls.php:284
+#: wpu_polls.php:286
 msgid "Close this poll now"
 msgstr "Fermer ce sondage maintenant"
 
-#: wpu_polls.php:288
+#: wpu_polls.php:290
 msgid "Close this poll on :"
 msgstr "Fermer ce sondage le :"
 
-#: wpu_polls.php:289
+#: wpu_polls.php:291
 #, php-format
 msgid "Current date: %s"
 msgstr "Date actuelle : %s"
 
-#: wpu_polls.php:295
+#: wpu_polls.php:297
 msgid "Display a message when poll is closed instead of the results"
 msgstr "Afficher un message lorsque le sondage est fermé au lieu des résultats"
 
-#: wpu_polls.php:302
+#: wpu_polls.php:304
 msgid "Custom message for closed poll"
 msgstr "Message personnalisé pour le sondage fermé"
 
-#: wpu_polls.php:308 wpu_polls.php:417
+#: wpu_polls.php:311 wpu_polls.php:420
 msgid "Question"
 msgstr "Question"
 
-#: wpu_polls.php:318
+#: wpu_polls.php:321
 msgid "Extra infos"
 msgstr "Infos supplémentaires"
 
-#: wpu_polls.php:322
+#: wpu_polls.php:325
 msgid "Success message and results"
 msgstr "Message de réussite et résultats"
 
-#: wpu_polls.php:326
+#: wpu_polls.php:329
 msgid "Closed poll settings"
 msgstr "Paramètres de fermeture du sondage"
 
-#: wpu_polls.php:330 wpu_polls.php:374 wpu_polls.php:376 wpu_polls.php:540
+#: wpu_polls.php:333 wpu_polls.php:377 wpu_polls.php:379 wpu_polls.php:543
 msgid "Poll"
 msgstr "Sondage"
 
-#: wpu_polls.php:341
+#: wpu_polls.php:344
 msgid "You need to select less min answer than max answers."
 msgstr ""
 "Vous devez sélectionner moins de réponses minimales que de réponses "
 "maximales."
 
-#: wpu_polls.php:342
+#: wpu_polls.php:345
 msgid "You need to select more max answer than min answers."
 msgstr ""
 "Vous devez sélectionner plus de réponses maximales que de réponses minimales."
 
-#: wpu_polls.php:343
+#: wpu_polls.php:346
 msgid "Do you really want to delete this vote ?"
 msgstr "Voulez-vous vraiment supprimer ce vote ?"
 
-#: wpu_polls.php:344
+#: wpu_polls.php:347
 msgid "You can’t have only empty choices"
 msgstr "Vous ne pouvez pas avoir seulement des choix vides"
 
-#: wpu_polls.php:345
+#: wpu_polls.php:348
 msgid "Images should be on every choice, or none of them."
 msgstr "Les images devraient être sur tous les choix, ou aucun d’entre eux."
 
-#: wpu_polls.php:346
+#: wpu_polls.php:349
 msgid "Text should be on every choice, or none of them."
 msgstr "Le texte devrait être sur chaque choix, ou aucun d’entre eux."
 
-#: wpu_polls.php:347
+#: wpu_polls.php:350
 msgid "You need at least two choices."
 msgstr "Vous avez besoin d’au moins deux choix."
 
-#: wpu_polls.php:360 wpu_polls.php:578
+#: wpu_polls.php:363 wpu_polls.php:581
 msgid "No vote"
 msgstr "Aucun vote"
 
-#: wpu_polls.php:361 wpu_polls.php:580
+#: wpu_polls.php:364 wpu_polls.php:583
 msgid "1 vote"
 msgstr "1 vote"
 
-#: wpu_polls.php:362 wpu_polls.php:586
+#: wpu_polls.php:365 wpu_polls.php:589
 #, php-format
 msgid "%d votes"
 msgstr "%d votes"
 
-#: wpu_polls.php:373 wpu_polls.php:375 wpu_polls.php:399
+#: wpu_polls.php:376 wpu_polls.php:378 wpu_polls.php:402
 msgid "Polls"
 msgstr "Sondages"
 
-#: wpu_polls.php:377
+#: wpu_polls.php:380
 msgid "Add New"
 msgstr "Ajouter"
 
-#: wpu_polls.php:378
+#: wpu_polls.php:381
 msgid "Add New Poll"
 msgstr "Ajouter un nouveau sondage"
 
-#: wpu_polls.php:379
+#: wpu_polls.php:382
 msgid "New Poll"
 msgstr "Nouveau Sondage"
 
-#: wpu_polls.php:380
+#: wpu_polls.php:383
 msgid "Edit Poll"
 msgstr "Modifier le sondage"
 
-#: wpu_polls.php:381
+#: wpu_polls.php:384
 msgid "View Poll"
 msgstr "Voir le sondage"
 
-#: wpu_polls.php:382
+#: wpu_polls.php:385
 msgid "All Polls"
 msgstr "Tous les sondages"
 
-#: wpu_polls.php:383
+#: wpu_polls.php:386
 msgid "Search Polls"
 msgstr "Rechercher un sondage"
 
-#: wpu_polls.php:384
+#: wpu_polls.php:387
 msgid "Parent Polls:"
 msgstr "Sondage Parent:"
 
-#: wpu_polls.php:385
+#: wpu_polls.php:388
 msgid "No polls found."
 msgstr "Aucun sondage trouvé."
 
-#: wpu_polls.php:386
+#: wpu_polls.php:389
 msgid "No polls found in Trash."
 msgstr "Aucun sondage trouvé dans la corbeille."
 
-#: wpu_polls.php:387
+#: wpu_polls.php:390
 msgid "Poll archives"
 msgstr "Archives des sondages"
 
-#: wpu_polls.php:388
+#: wpu_polls.php:391
 msgid "Insert into poll"
 msgstr "Insérer dans le sondage"
 
-#: wpu_polls.php:389
+#: wpu_polls.php:392
 msgid "Uploaded to this poll"
 msgstr "Téléchargé vers ce sondage"
 
-#: wpu_polls.php:390
+#: wpu_polls.php:393
 msgid "Filter polls list"
 msgstr "Filtrer la liste des sondages"
 
-#: wpu_polls.php:391
+#: wpu_polls.php:394
 msgid "Polls list navigation"
 msgstr "Navigation dans la liste des sondages"
 
-#: wpu_polls.php:392
+#: wpu_polls.php:395
 msgid "Polls list"
 msgstr "Liste des sondages"
 
-#: wpu_polls.php:418
+#: wpu_polls.php:421
 msgid "Number of votes"
 msgstr "Nombre de votes"
 
-#: wpu_polls.php:527
+#: wpu_polls.php:530
 msgid "The vote has been successfully deleted."
 msgstr "Le vote a été supprimé avec succès."
 
-#: wpu_polls.php:543
+#: wpu_polls.php:546
 msgid "This poll is closed."
 msgstr "Ce sondage est fermé."
 
-#: wpu_polls.php:550
+#: wpu_polls.php:553
 msgid "Image"
 msgstr "Image"
 
-#: wpu_polls.php:561
+#: wpu_polls.php:564
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
-#: wpu_polls.php:631
+#: wpu_polls.php:634
 msgid "Add an image"
 msgstr "Ajouter une image"
 
-#: wpu_polls.php:632
+#: wpu_polls.php:635
 msgid "Remove this image"
 msgstr "Retirer cette image"
 
-#: wpu_polls.php:646
+#: wpu_polls.php:649
 msgid "Delete this reply"
 msgstr "Supprimer cette réponse"
 
-#: wpu_polls.php:799
+#: wpu_polls.php:802
 msgid "Invalid poll"
 msgstr "Sondage invalide"
 
-#: wpu_polls.php:804 wpu_polls.php:1270
+#: wpu_polls.php:807 wpu_polls.php:1273
 msgid "Poll is closed"
 msgstr "Le sondage est fermé"
 
-#: wpu_polls.php:814
+#: wpu_polls.php:817
 msgid "Too much answers"
 msgstr "Trop de réponses"
 
-#: wpu_polls.php:823
+#: wpu_polls.php:826
 msgid "Not enough answers"
 msgstr "Pas assez de réponses"
 
-#: wpu_polls.php:842 wpu_polls.php:845
+#: wpu_polls.php:845 wpu_polls.php:848
 msgid "Form is invalid"
 msgstr "Le formulaire n’est pas valide"
 
-#: wpu_polls.php:855 wpu_polls.php:862 wpu_polls.php:877
+#: wpu_polls.php:858 wpu_polls.php:865 wpu_polls.php:880
 msgid "You have already sent a reply"
 msgstr "Vous avez déjà envoyé une réponse"
 
-#: wpu_polls.php:890
+#: wpu_polls.php:893
 msgid "Invalid answer"
 msgstr "Réponse non valide"
 
-#: wpu_polls.php:894
+#: wpu_polls.php:897
 msgid "Max number of answers has been reached"
 msgstr "Le nombre maximum de réponses a été atteint"
 
-#: wpu_polls.php:1218
+#: wpu_polls.php:1221
 #, php-format
 msgid "I agree to be contacted by phone or email by %s or its partners."
 msgstr ""
 "J’accepte d’être contacté par téléphone ou par email par %s ou ses "
 "partenaires."
 
-#: wpu_polls.php:1234
+#: wpu_polls.php:1237
 msgid "Comment"
 msgstr "Commentaire"
 
-#: wpu_polls.php:1256
+#: wpu_polls.php:1259
 msgid "Thank you for your vote !"
 msgstr "Merci pour votre vote !"
 
-#: wpu_polls.php:1311
+#: wpu_polls.php:1314
 msgid "Available: "
 msgstr "Disponible: "
 

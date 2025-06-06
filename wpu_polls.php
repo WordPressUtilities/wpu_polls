@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.27.0
+Version: 0.27.1
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.27.0';
+    private $plugin_version = '0.27.1';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -232,7 +232,8 @@ class WPUPolls {
                     'wpu_polls__gdprcheckbox' => 'checked'
                 ),
                 'group' => 'wpu_polls__extra_infos',
-                'label' => __('Custom GDPR message', 'wpu_polls')
+                'label' => __('Custom GDPR message', 'wpu_polls'),
+                'help' => has_filter('wpu_polls__gdprcheckbox__text') ? '⚠️ ' . __('This value is overriden by a filter in the source code.', 'wpu_polls') : '',
             ),
             'wpu_polls__comment_field' => array(
                 'type' => 'checkbox',
@@ -251,7 +252,8 @@ class WPUPolls {
                     'wpu_polls__displaymessage' => 'checked'
                 ),
                 'group' => 'wpu_polls__success',
-                'label' => __('Custom text message after vote', 'wpu_polls')
+                'label' => __('Custom text message after vote', 'wpu_polls'),
+                'help' => has_filter('wpu_polls__displaymessage__content') ? '⚠️ ' . __('This value is overriden by a filter in the source code.', 'wpu_polls') : ''
             ),
             'wpu_polls__sort_results' => array(
                 'type' => 'checkbox',
@@ -299,7 +301,8 @@ class WPUPolls {
                     'wpu_polls__poll_closed__displaymessage' => 'checked'
                 ),
                 'group' => 'wpu_polls__closed',
-                'label' => __('Custom message for closed poll', 'wpu_polls')
+                'label' => __('Custom message for closed poll', 'wpu_polls'),
+                'help' => has_filter('wpu_polls__closedmessage__content') ? '⚠️ ' . __('This value is overriden by a filter in the source code.', 'wpu_polls') : ''
             ),
 
             /* Poll */
