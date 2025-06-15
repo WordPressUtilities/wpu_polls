@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.27.3
+Version: 0.27.4
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.27.3';
+    private $plugin_version = '0.27.4';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -273,9 +273,6 @@ class WPUPolls {
             'wpu_polls__sort_results' => array(
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__success',
-                'toggle-display' => array(
-                    'wpu_polls__limit_results' => 'notchecked'
-                ),
                 'label' => __('Sort results by number of votes', 'wpu_polls')
             ),
             'wpu_polls__hide_stats_results' => array(
@@ -1116,9 +1113,6 @@ class WPUPolls {
         $comment_field = get_post_meta($poll_id, 'wpu_polls__comment_field', 1);
         $sort_results = get_post_meta($poll_id, 'wpu_polls__sort_results', 1);
         $limit_results = get_post_meta($poll_id, 'wpu_polls__limit_results', 1);
-        if ($limit_results) {
-            $sort_results = true;
-        }
         $limit_results__number = $this->nb_max;
         if ($limit_results) {
             $limit_results__number_value = get_post_meta($poll_id, 'wpu_polls__limit_results__number', 1);
@@ -1165,14 +1159,12 @@ class WPUPolls {
         }
 
         /* Results */
-        if ($sort_results) {
-            usort($answers, function ($a, $b) {
-                return $b['results_count'] - $a['results_count'];
-            });
-        }
+        usort($answers, function ($a, $b) {
+            return $b['results_count'] - $a['results_count'];
+        });
         foreach ($answers as $i => $answer) {
             $answer_id = $id_prefix . $answer['uniqid'];
-            if ($i < $limit_results__number || !$sort_results) {
+            if ($i < $limit_results__number) {
                 $html_results .= '<li data-i="' . ($i + 1) . '" class="wpu-poll-results__answer" data-results-id="' . esc_attr($answer['uniqid']) . '">';
                 $html_results .= $this->get_vote_content__item_results($answer_id, $answer, array(
                     'hide_stats_results' => $hide_stats_results
