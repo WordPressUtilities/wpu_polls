@@ -4,7 +4,7 @@ namespace wpu_polls;
 /*
 Class Name: WPU Base Admin Datas
 Description: A class to handle datas in WordPress admin
-Version: 4.7.0
+Version: 4.8.0
 Class URI: https://github.com/WordPressUtilities/wpubaseplugin
 Author: Darklg
 Author URI: https://darklg.me/
@@ -100,7 +100,11 @@ class WPUBaseAdminDatas {
         // Build query
         foreach ($settings['table_fields'] as $id => $field) {
             if (!isset($field['public_name'])) {
-                $settings['table_fields'][$id]['public_name'] = $id;
+                $_name = $id;
+                if (isset($field['label'])) {
+                    $_name = $field['label'];
+                }
+                $settings['table_fields'][$id]['public_name'] = $_name;
             }
             if (!isset($field['type'])) {
                 $settings['table_fields'][$id]['type'] = isset($field['type']) ? $field['type'] : 'varchar';
@@ -188,7 +192,7 @@ class WPUBaseAdminDatas {
         // If query has changed since last time
         $sql_md5 = md5($sql_query . 'erazaa' . serialize($table_fields));
         $sql_option_value = get_option($this->sql_option_name);
-        if ($sql_md5 != $sql_option_value) {
+        if ($sql_md5 != $sql_option_value . 'a') {
             // Update or create table
             require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
@@ -196,6 +200,9 @@ class WPUBaseAdminDatas {
             maybe_create_table($this->tablename, $sql_query);
 
             $columns = $wpdb->get_results("DESC " . $this->tablename);
+            $columns_keys = array_map(function ($col) {
+                return $col->Field;
+            }, $columns);
             foreach ($columns as $column) {
                 if ($column->Field != 'id' && $column->Type == $this->settings['id_type']) {
                     continue;
@@ -211,6 +218,9 @@ class WPUBaseAdminDatas {
                 case 'number':
                     $col_sql = 'MEDIUMINT UNSIGNED';
                     break;
+                case 'date':
+                    $col_sql = 'DATE';
+                    break;
                 case 'timestamp':
                     $col_sql = 'TIMESTAMP';
                     break;
@@ -218,7 +228,12 @@ class WPUBaseAdminDatas {
                     $col_sql = $col['sql'];
                 }
 
-                maybe_add_column($this->tablename, $column_name, 'ALTER TABLE ' . $this->tablename . ' ADD ' . $column_name . ' ' . $col_sql);
+                if (in_array($column_name, $columns_keys)) {
+                    $wpdb->query("ALTER TABLE " . $this->tablename . " MODIFY COLUMN " . $column_name . " " . $col_sql);
+                } else {
+                    maybe_add_column($this->tablename, $column_name, 'ALTER TABLE ' . $this->tablename . ' ADD ' . $column_name . ' ' . $col_sql);
+                }
+
             }
 
             // Update option hash
@@ -397,6 +412,10 @@ class WPUBaseAdminDatas {
         switch ($field['field_type']) {
         case 'email':
             return !!filter_var($value, FILTER_VALIDATE_EMAIL);
+            break;
+
+        case 'date':
+            return !!\DateTime::createFromFormat('Y-m-d', $value);
             break;
 
         case 'url':
@@ -879,7 +898,8 @@ class WPUBaseAdminDatas {
                 $content .= '<th scope="row" class="check-column" class="column-cb check-column"><input type="checkbox" name="select_line[' . $vals->id . ']" value="' . $vals->id . '" /></th>';
             }
             foreach ($vals as $cell_id => $val) {
-                $val = (empty($val) ? '&nbsp;' : $val);
+                $val = (empty($val) ? "\xC2\xA0" : $val);
+                $val = htmlspecialchars($val, ENT_QUOTES, "UTF-8");
                 $content .= '<td data-colname="' . esc_attr($args['columns'][$cell_id]['label']) . '" class="' . ($cell_id == $args['primary_column'] ? 'column-primary' : '') . '">';
                 $cell_content = apply_filters('wpubaseadmindatas_cellcontent', $val, $cell_id, $this->settings);
 

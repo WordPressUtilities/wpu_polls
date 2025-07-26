@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.27.4
+Version: 0.28.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.27.4';
+    private $plugin_version = '0.28.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -120,6 +120,7 @@ class WPUPolls {
                 ),
                 'comment' => array(
                     'public_name' => 'Comment',
+                    'type' => 'sql',
                     'sql' => 'text'
                 )
             )
@@ -925,7 +926,11 @@ class WPUPolls {
                 $answer_data['user_name'] = $post['user_name'];
                 $answer_data['gdpr'] = isset($post['user_gdpr']) ? 1 : 0;
             }
-            $this->baseadmindatas->create_line($answer_data);
+            $create_line = $this->baseadmindatas->create_line($answer_data);
+
+            if (!$create_line) {
+                wp_send_json_error(array('stop_form' => true, 'mark_as_voted' => false, 'error_message' => __('Failed to record your vote', 'wpu_polls')));
+            }
         }
 
         update_post_meta($poll_id, 'wpu_polls__last_update', time());
