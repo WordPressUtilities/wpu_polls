@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     /* Mark as voted */
                     if (response.data.hasOwnProperty('mark_as_voted') && response.data.mark_as_voted) {
-                        localStorage.setItem('wpu_polls_' + _poll_id, '1');
+                        set_vote(_poll_id);
                     }
 
                     $main.removeClass('is-loading');
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 /* Store vote status */
-                localStorage.setItem('wpu_polls_' + _poll_id, '1');
+                set_vote(_poll_id);
 
                 /* Update status */
                 check_wrapper_vote($main, _poll_id);
@@ -327,9 +327,35 @@ document.addEventListener('DOMContentLoaded', function() {
         $item.find('.bar-count').css('width', _percent + '%');
     }
 
+    function set_vote(_poll_id) {
+        if (typeof(window.localStorage) === "object") {
+            localStorage.setItem('wpu_polls_' + _poll_id, '1');
+        }
+        /* Also set a cookie for fallback */
+        document.cookie = 'wpu_polls_' + _poll_id + '=1; path=/; max-age=31536000';
+    }
+
+    function get_vote(_poll_id) {
+        var _vote = null;
+        if (typeof(window.localStorage) === "object") {
+            _vote = localStorage.getItem('wpu_polls_' + _poll_id);
+        }
+        if (!_vote) {
+            var match = document.cookie.match(new RegExp('(^| )wpu_polls_' + _poll_id + '=([^;]+)'));
+            if (match) {
+                _vote = match[2];
+            }
+        }
+        return _vote;
+    }
+
     function check_wrapper_vote($wrapper, _poll_id) {
-        var _vote = localStorage.getItem('wpu_polls_' + _poll_id);
-        if (_vote == '1') {
+        var _vote,
+            _hasLocalStorage = typeof(window.localStorage) === "object";
+        if (_hasLocalStorage) {
+            _vote = get_vote(_poll_id);
+        }
+        if (!_hasLocalStorage || _vote == '1') {
             $wrapper.attr('data-has-voted', 1);
             $wrapper.find('.wpu-poll-main').remove();
         }
