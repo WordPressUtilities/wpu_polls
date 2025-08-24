@@ -132,6 +132,20 @@ document.addEventListener('DOMContentLoaded', function() {
         return isFormValid;
     }
 
+    // Setup optional comment
+    jQuery('.wpu-polls-comment-area').each(function() {
+        var $commentArea = jQuery(this);
+
+        if ($commentArea.attr('data-has-checkbox') != '1') {
+            return;
+        }
+
+        var $checkbox = $commentArea.find('.wpu-polls-checkbox-wrapper input[type="checkbox"]');
+        $checkbox.on('change', function() {
+            $commentArea.attr('data-checked', $checkbox.prop('checked') ? '1' : '0');
+        });
+    });
+
     jQuery('.wpu-poll-main__wrapper').each(function(i, $el) {
         /* Initial check */
         check_required_details(jQuery($el));

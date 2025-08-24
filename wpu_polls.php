@@ -5,7 +5,7 @@ Plugin Name: WPU Polls
 Plugin URI: https://github.com/WordPressUtilities/wpu_polls
 Update URI: https://github.com/WordPressUtilities/wpu_polls
 Description: WPU Polls handle simple polls
-Version: 0.29.0
+Version: 0.30.0
 Author: Darklg
 Author URI: https://darklg.me/
 Text Domain: wpu_polls
@@ -18,7 +18,7 @@ License URI: https://opensource.org/licenses/MIT
 */
 
 class WPUPolls {
-    private $plugin_version = '0.29.0';
+    private $plugin_version = '0.30.0';
     private $plugin_settings = array(
         'id' => 'wpu_polls',
         'name' => 'WPU Polls'
@@ -140,7 +140,9 @@ class WPUPolls {
             'create_page' => true,
             'plugin_basename' => plugin_basename(__FILE__),
             # Default
+            'parent_page' => 'edit.php?post_type=polls',
             'plugin_name' => $this->plugin_settings['name'],
+            'menu_name' => __('Settings', 'wpu_polls'),
             'plugin_id' => $this->plugin_settings['id'],
             'option_id' => $this->plugin_settings['id'] . '_options',
             'sections' => array(
@@ -160,15 +162,18 @@ class WPUPolls {
             ),
             'gdpr_message' => array(
                 'label' => __('Default GDPR Message', 'wpu_polls'),
-                'type' => 'textarea'
+                'type' => 'textarea',
+                'lang' => true
             ),
             'success_message' => array(
                 'label' => __('Default Success Message', 'wpu_polls'),
-                'type' => 'textarea'
+                'type' => 'textarea',
+                'lang' => true
             ),
             'closed_message' => array(
                 'label' => __('Default Closed Poll Message', 'wpu_polls'),
-                'type' => 'textarea'
+                'type' => 'textarea',
+                'lang' => true
             )
         );
         require_once __DIR__ . '/inc/WPUBaseSettings/WPUBaseSettings.php';
@@ -241,6 +246,14 @@ class WPUPolls {
                 'type' => 'checkbox',
                 'group' => 'wpu_polls__extra_infos',
                 'label' => __('Display a comment field', 'wpu_polls')
+            ),
+            'wpu_polls__comment_field__checkbox' => array(
+                'type' => 'checkbox',
+                'group' => 'wpu_polls__extra_infos',
+                'label' => __('Display the comment field if a checkbox is checked', 'wpu_polls'),
+                'toggle-display' => array(
+                    'wpu_polls__comment_field' => 'checked'
+                )
             ),
 
             /* Success */
@@ -1116,6 +1129,7 @@ class WPUPolls {
         $displaymessage_closed = get_post_meta($poll_id, 'wpu_polls__poll_closed__displaymessage', 1);
         $gdprcheckbox = get_post_meta($poll_id, 'wpu_polls__gdprcheckbox', 1);
         $comment_field = get_post_meta($poll_id, 'wpu_polls__comment_field', 1);
+        $comment_field__has_checkbox = $comment_field && get_post_meta($poll_id, 'wpu_polls__comment_field__checkbox', 1);
         $sort_results = get_post_meta($poll_id, 'wpu_polls__sort_results', 1);
         $limit_results = get_post_meta($poll_id, 'wpu_polls__limit_results', 1);
         $limit_results__number = $this->nb_max;
@@ -1252,9 +1266,13 @@ class WPUPolls {
 
         if ($comment_field) {
             $label_comment = apply_filters('wpu_polls__comment_label', __('Comment', 'wpu_polls'));
-            $html .= '<div class="wpu-polls-comment-area">';
+            $html .= '<div class="wpu-polls-comment-area" data-has-checkbox="' . ($comment_field__has_checkbox ? '1' : '0') . '">';
             $html .= '<p>';
-            $html .= '<label for="' . $id_prefix . '_comment">' . $label_comment . '</label>';
+            $html .= '<label for="' . $id_prefix . '_comment">';
+            if ($comment_field__has_checkbox) {
+                $html .= '<span class="wpu-polls-checkbox-wrapper"><input type="checkbox" name="' . $id_prefix . '_comment_checkbox" value="1" /></span>';
+            }
+            $html .= $label_comment . '</label>';
             $html .= '<textarea id="' . $id_prefix . '_comment" name="user_comment"></textarea>';
             $html .= '</p>';
             $html .= '</div>';
