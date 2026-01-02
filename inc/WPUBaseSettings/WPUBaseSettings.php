@@ -4,7 +4,7 @@ namespace wpu_polls;
 /*
 Class Name: WPU Base Settings
 Description: A class to handle native settings in WordPress admin
-Version: 0.24.4
+Version: 0.24.7
 Class URI: https://github.com/WordPressUtilities/wpubaseplugin
 Author: Darklg
 Author URI: https://darklg.me/
@@ -204,6 +204,9 @@ class WPUBaseSettings {
             if (!isset($section['before_section'])) {
                 $section['before_section'] = '';
             }
+            if (!isset($section['is_open'])) {
+                $section['is_open'] = true;
+            }
             if (!isset($section['after_section'])) {
                 $section['after_section'] = '';
             }
@@ -215,7 +218,7 @@ class WPUBaseSettings {
                     add_action('admin_footer', array(&$this, 'admin_footer_checkall'));
                 }
             }
-            $section['before_section'] = '<div class="wpubasesettings-form-table-section">' . $section['before_section'];
+            $section['before_section'] = '<div data-section-id="' . ($this->settings_details['option_id'] . '_' . $id) . '" class="wpubasesettings-form-table-section ' . ($section['is_open'] ? '' : 'is-closed') . '">' . $section['before_section'];
             $section['after_section'] = $section['after_section'] . '</div>';
             add_settings_section(
                 $id,
@@ -396,12 +399,13 @@ class WPUBaseSettings {
             break;
         case 'post':
         case 'page':
+            $dropdown_post_type = isset($args['post_type']) ? $args['post_type'] : $args['type'];
             $page_dropdown_args = array(
                 'echo' => false,
                 'name' => $name_val,
                 'id' => $args['id'],
                 'selected' => $value,
-                'post_type' => isset($args['post_type']) ? $args['post_type'] : $args['type']
+                'post_type' => $dropdown_post_type
             );
 
             if (isset($args['lang_id']) && $args['lang_id'] && function_exists('pll_get_post')) {
@@ -409,6 +413,9 @@ class WPUBaseSettings {
             }
             $code_dropdown = wp_dropdown_pages($page_dropdown_args);
             echo str_replace('<select ', '<select ' . $attr, $code_dropdown);
+            if (empty($code_dropdown)) {
+                echo '<p ' . $attr . '>-</p>';
+            }
             break;
         case 'select':
             echo '<select ' . $name . ' ' . $id . '>';
@@ -601,10 +608,24 @@ var jQform = jQinput.closest('form');
 /* Add toggles on titles */
 jQform.find('h2').each(function(i,el){
     var jQel = jQuery(el),
-        jQWrap = jQel.closest('.wpubasesettings-form-table-section');
-    jQWrap.addClass('is-open');
+        jQWrap = jQel.closest('.wpubasesettings-form-table-section'),
+        _local_storage_key = 'wpubasesettings_section_' + jQWrap.data('section-id') + '_is_open';
+    if(jQWrap.hasClass('is-closed')){
+        jQWrap.removeClass('is-closed');
+    }
+    else {
+        jQWrap.addClass('is-open');
+    }
+    var stored_state = window.localStorage.getItem(_local_storage_key);
+    if(stored_state === '1'){
+        jQWrap.removeClass('is-open');
+    }
+    if(stored_state === '0'){
+        jQWrap.addClass('is-open');
+    }
     jQel.on('click',function(){
         jQWrap.toggleClass('is-open');
+        window.localStorage.setItem(_local_storage_key, jQWrap.hasClass('is-open') ? '0' : '1');
     });
 });
 

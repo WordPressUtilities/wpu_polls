@@ -4,7 +4,7 @@ namespace wpu_polls;
 /*
 Class Name: WPU Base Admin Datas
 Description: A class to handle datas in WordPress admin
-Version: 4.11.0
+Version: 4.11.3
 Class URI: https://github.com/WordPressUtilities/wpubaseplugin
 Author: Darklg
 Author URI: https://darklg.me/
@@ -170,6 +170,9 @@ class WPUBaseAdminDatas {
             return;
         }
         global $wpdb;
+        if (!$wpdb || !$wpdb->ready) {
+            return;
+        }
 
         // Assemble fields
         $fields_query = array(
@@ -403,6 +406,7 @@ class WPUBaseAdminDatas {
                 array('ID' => $item_id)
             );
         }
+        return $item_id;
     }
 
     /* ----------------------------------------------------------
@@ -884,7 +888,7 @@ class WPUBaseAdminDatas {
         $content .= '<input type="hidden" name="action" value="admindatas_' . $this->settings['plugin_id'] . '">';
         $content .= '<input type="hidden" name="page" value="' . esc_attr($page_id) . '" />';
         $content .= wp_nonce_field('action-main-form-' . $page_id, 'action-main-form-admin-datas-' . $page_id, true, false);
-        if ($has_id && $is_admin_view && $this->settings['can_create']) {
+        if ($is_admin_view && $this->settings['can_create']) {
             $new_url = add_query_arg(array('backquery' => $_back_query), $this->pagename . '&create=1');
             $content .= '<p><a class="page-title-action" href="' . $new_url . '">' . __('New Post', $this->settings['plugin_id']) . '</a></p>';
         }
@@ -1066,10 +1070,10 @@ HTML;
         $line_id = ($line && is_array($line) && isset($line['id'])) ? $line['id'] : false;
         if ($line_id) {
             $datas = array_merge($datas, $args['extra_datas_updated']);
-            $this->edit_line($line_id, $datas);
+            return $this->edit_line($line_id, $datas);
         } else {
             $datas = array_merge($datas, $args['extra_datas_created']);
-            $this->create_line($datas);
+            return $this->create_line($datas);
         }
     }
 
